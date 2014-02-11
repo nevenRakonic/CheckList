@@ -1,0 +1,15 @@
+<!DOCTYPE html>  
+<html lang="en">  
+	<head>
+			<meta charset="utf-8" />  
+			<title>Check List</title> 
+			<!--<link rel="stylesheet" type="text/css" href="fluid.css">-->  
+	</head>  
+
+	<body>
+        {% for post in posts %}
+         <p>{{post.body}}</p>
+         <p>{{post.post_time}}</p>
+        {% endfor %}
+	</body>
+</html>
