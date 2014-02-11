@@ -8,8 +8,12 @@
 
 	<body>
         {% for post in posts %}
+         <p><strong>----------------------</strong></p>
          <p>{{post.body}}</p>
          <p>{{post.post_time}}</p>
+         <p>{{post.comment}}</p>
+         <p>{{post.status}}</p>
+         <p><strong>----------------------</strong></p>
         {% endfor %}
 	</body>
 </html>

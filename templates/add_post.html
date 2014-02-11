@@ -1,0 +1,29 @@
+<!DOCTYPE html>  
+<html lang="en">  
+    <head>
+            <meta charset="utf-8" />  
+            <title>Check List</title> 
+            <!--<link rel="stylesheet" type="text/css" href="fluid.css">-->  
+    </head>  
+
+    <body>
+        <form action="/add_post" method="POST">
+            <!-- implement CSRF token here-->
+            <label>Body</label>
+            <input name="body">
+            <br/>
+
+            <label>Comment</label>
+            <input name="comment">
+            <br/>
+
+            <label>Status</label>
+            <input type="radio" name="status" value="WIP">WIP<br>
+            <input type="radio" name="status" value="DONE">DONE<br>
+            <input type="radio" name="status" value="TODO">TODO
+            <br />
+
+            <input type="submit" value="Add post">
+        </form>
+    </body>
+</html>

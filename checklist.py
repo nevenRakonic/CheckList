@@ -1,5 +1,6 @@
 import sqlite3
-from flask import Flask, render_template
+from datetime import datetime
+from flask import Flask, render_template, request
 from flask import g
 
 
@@ -40,6 +41,28 @@ def close_connection(exception):
 def home():
     posts = query_db('select * from posts')
     return render_template('index.html', posts=posts)
+
+@app.route('/add_post', methods=['GET','POST'])
+def add_post():
+    if request.method == 'POST':
+        db = get_db()
+
+        body = request.form['body']
+        comment = request.form['comment']
+        status = request.form['status']
+        post_time = str(datetime.now())
+        post_time = post_time[:-7]  #removes miliseconds from time
+
+        db.execute(
+            'insert into posts (body, comment, status, post_time) values (?, ?, ?, ?);',
+             [body, comment, status, post_time]
+             )
+        db.commit()
+        #TODO FLASH MESSAGE HERE
+        #REDIRECT HERE
+
+    return render_template('add_post.html')
+
 
 if __name__ == '__main__':
     app.run()
