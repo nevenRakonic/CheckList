@@ -63,6 +63,19 @@ def add_post():
 
     return render_template('add_post.html')
 
+@app.route('/<post_num>/showpost/')
+def show_post(post_num):
+    db = get_db()
+
+    post = query_db('SELECT * FROM POSTS WHERE ID=%s' % post_num)
+    return render_template('index.html', posts = post, edit=True)
+
+#add editing ability
+@app.rout('/<post_num>/edit/')
+def edit_post(post_num):
+    pass
+
+
 
 if __name__ == '__main__':
     app.run()

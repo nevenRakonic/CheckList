@@ -20,6 +20,10 @@
         </div>
         {% endfor %}
 
+        {% if edit %}
+        <p>edit link</p>
+        {% endif %}
+
 
 	</body>
         <script src="{{url_for('static', filename='scripts.js')}}"></script>
