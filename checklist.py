@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
-from flask import Flask, render_template, request
-from flask import g
+from flask import Flask, render_template, request, url_for
+from flask import g, redirect
 
 
 app = Flask(__name__)
@@ -36,13 +36,13 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-#CONTROLLERS
+#VIEWS
 @app.route('/')
 def home():
-    posts = query_db('select * from posts')
+    posts = query_db('SELECT * FROM posts ORDER BY post_time DESC;')
     return render_template('index.html', posts=posts)
 
-@app.route('/add_post', methods=['GET','POST'])
+@app.route('/add_post/', methods=['GET','POST'])
 def add_post():
     if request.method == 'POST':
         db = get_db()
@@ -54,12 +54,12 @@ def add_post():
         post_time = post_time[:-7]  #removes miliseconds from time
 
         db.execute(
-            'insert into posts (body, comment, status, post_time) values (?, ?, ?, ?);',
+            'INSERT INTO posts (body, comment, status, post_time) VALUES (?, ?, ?, ?);',
              [body, comment, status, post_time]
              )
         db.commit()
         #TODO FLASH MESSAGE HERE
-        #REDIRECT HERE
+        redirect(url_for('home'))
 
     return render_template('add_post.html')
 

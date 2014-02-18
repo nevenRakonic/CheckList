@@ -3,17 +3,24 @@
 	<head>
 			<meta charset="utf-8" />  
 			<title>Check List</title> 
-			<!--<link rel="stylesheet" type="text/css" href="fluid.css">-->  
+			<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='static.css')}}"> 
+                        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	</head>  
 
 	<body>
+        <a href="/add_post/">Add post</a>
+        
         {% for post in posts %}
+         <div class="{{post.status}}">       
          <p><strong>----------------------</strong></p>
          <p>{{post.body}}</p>
          <p>{{post.post_time}}</p>
-         <p>{{post.comment}}</p>
-         <p>{{post.status}}</p>
+         <p>{{post.comment}}</p>         
          <p><strong>----------------------</strong></p>
+        </div>
         {% endfor %}
+
+
 	</body>
+        <script src="{{url_for('static', filename='scripts.js')}}"></script>
 </html>

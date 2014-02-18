@@ -1,0 +1,20 @@
+body {
+    width: 900px;
+    margin: 0 auto;
+}
+
+div {
+    text-align: center;
+}
+
+.WIP {
+    background-color: red;
+}
+
+.DONE {
+    background-color: green;
+}
+
+.WIP {
+    background-color: orange;
+}
