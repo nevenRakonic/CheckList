@@ -11,22 +11,16 @@
         <a href="/add_post/">Add post</a>
         
         {% for post in posts %}
-         <div class="{{post.status}}">       
-         <p><strong>----------------------</strong></p>
-         <p>{{post.body}}</p>
-         <p>{{post.post_time}}</p>
-         <p>{{post.comment}}</p>         
-         <p><strong>----------------------</strong></p>
-         <a href="/{{post.id}}/edit/">Edit post</a>
-        </div>
+                <div class="{{post.status}}">       
+                         <p><strong>----------------------</strong></p>
+                         <p data-id="{{post.id}}" contenteditable="false">{{post.body}}</p>
+                         <p>{{post.post_time}}</p>
+                         <p>{{post.comment}}</p>         
+                         <p><strong>----------------------</strong></p>
+                         <a href="/{{post.id}}/edit/">Edit post</a>
+                         <span class="activate" data-id="{{post.id}}">live edit</span>
+                </div>
         {% endfor %}
-
-        <!--
-        {% if edit %}
-        <p>edit link</p>
-        {% endif %}
-        -->
-
 
 	</body>
         <script src="{{url_for('static', filename='scripts.js')}}"></script>

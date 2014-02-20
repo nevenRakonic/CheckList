@@ -7,7 +7,7 @@ div {
     text-align: center;
 }
 
-.WIP {
+.TODO {
     background-color: red;
 }
 
@@ -17,4 +17,9 @@ div {
 
 .WIP {
     background-color: orange;
+}
+
+.activate {
+    cursor: pointer;
+    color: #fff;
 }
