@@ -59,7 +59,7 @@ def add_post():
              )
         db.commit()
         #TODO FLASH MESSAGE HERE
-        redirect(url_for('home'))
+        return redirect(url_for('home'))
 
     return render_template('add_post.html')
 
@@ -68,12 +68,24 @@ def show_post(post_num):
     db = get_db()
 
     post = query_db('SELECT * FROM POSTS WHERE ID=%s' % post_num)
-    return render_template('index.html', posts = post, edit=True)
+    return render_template('index.html', posts=post, edit=True)
 
 #add editing ability
-@app.rout('/<post_num>/edit/')
+@app.route('/<post_num>/edit/', methods=['GET', 'POST'])
 def edit_post(post_num):
-    pass
+    db = get_db()   
+    
+    if request.method == 'POST':
+        text = request.form['text']
+
+        db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(text, post_num))
+        db.commit()
+        return redirect(url_for('home'))
+
+    text = query_db('SELECT body FROM posts WHERE ID=%s' % post_num, one=True)
+    print text
+
+    return render_template('edit.html', text=text, post_num=post_num)
 
 
 

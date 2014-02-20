@@ -17,12 +17,15 @@
          <p>{{post.post_time}}</p>
          <p>{{post.comment}}</p>         
          <p><strong>----------------------</strong></p>
+         <a href="/{{post.id}}/edit/">Edit post</a>
         </div>
         {% endfor %}
 
+        <!--
         {% if edit %}
         <p>edit link</p>
         {% endif %}
+        -->
 
 
 	</body>
