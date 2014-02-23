@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 from flask import Flask, render_template, request, url_for
-from flask import g, redirect
+from flask import g, redirect, jsonify
 
 
 app = Flask(__name__)
@@ -80,14 +80,23 @@ def edit_post(post_num):
 
         db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(text, post_num))
         db.commit()
-        return redirect(url_for('home'))
+        #return redirect(url_for('home'))
 
-    text = query_db('SELECT body FROM posts WHERE ID=%s' % post_num, one=True)
-    print text
+    text = query_db('SELECT body FROM posts WHERE ID=%s' % post_num, one=True)    
 
     return render_template('edit.html', text=text, post_num=post_num)
 
+@app.route('/edit/')
+def edit():
+    db = get_db()
 
+    body = request.args.get('body', "default", type=unicode)
+    body = body.encode('utf-8')
+    print "inside GET"
+    print body
+    db.execute('UPDATE posts SET body="{0}" WHERE ID=7'.format(body))
+    db.commit()
+    return jsonify(result=body)
 
 if __name__ == '__main__':
     app.run()
