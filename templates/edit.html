@@ -1,19 +1,12 @@
-<!DOCTYPE html>  
-<html lang="en">  
-    <head>
-            <meta charset="utf-8" />  
-            <title>Check List</title> 
-            <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='static.css')}}"> 
-            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    </head>  
-
-    <body>
+{% extends "base.html" %}
+    {% block body %}
+    
         <form action="/{{post_num}}/edit/" method="POST">
             <textarea name="text">{{text[0]}}</textarea>
             <input type="submit">
         </form>
 
+    {% endblock %}
 
-    </body>
-        <script src="{{url_for('static', filename='scripts.js')}}"></script>
-</html>
+
+

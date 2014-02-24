@@ -1,21 +1,20 @@
-$(function(){ 
-    
+$(function () {
     //ajax call to edit
-    var submit_post = function(to_edit, id) {
+    var submit_post = function (to_edit, id) {
       $.getJSON($SCRIPT_ROOT + '/edit', {
         body: $(to_edit).text(),
-        id: id        
-      },function(data) {
+        id: id
+      }, function (data) {
         $(to_edit).text(data.result);        
       });
       return false;
     };
 
     //ajax call to delete    
-    var delete_post = function(id, div) {
-      $.getJSON($SCRIPT_ROOT + '/delete', {        
+    var delete_post = function (id, div) {
+        $.getJSON($SCRIPT_ROOT + '/delete', {        
         id: id        
-      },function(data) {
+      },function (data) {
         $(div).hide("slow");        
       });
       return false;
@@ -23,7 +22,7 @@ $(function(){
     
 
     //activates text editing on click   
-    $(".activate").click(function(){
+    $(".activate").click(function (){
 
         var id = $(this).data("id");
         var to_edit = "p[data-id='" + id + "']";
@@ -35,7 +34,7 @@ $(function(){
     });
 
     //saves text editing
-    $(".save").click(function (){
+    $(".save").click(function () {
         var id = $(this).data("id");
         var to_edit = "p[data-id='" + id + "']";
 
@@ -46,7 +45,7 @@ $(function(){
     });
 
     //deletes entry
-    $(".delete").click(function (){
+    $(".delete").click(function () {
         var id = $(this).data("id");
         var to_edit = "p[data-id='" + id + "']";
 
@@ -55,6 +54,8 @@ $(function(){
         delete_post(id, parent);
 
     });
+
+    //TODO SKRIPTA ZA MJENJANJE STATUSA
 
     
 });

@@ -1,18 +1,10 @@
-<!DOCTYPE html>  
-<html lang="en">  
-	<head>
-			<meta charset="utf-8" />  
-			<title>Check List</title>
-                        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.0/normalize.min.css" > 
-			<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='static.css')}}"> 
-                        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-                        <script>var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};</script>
-	</head>  
+{% extends "base.html" %}
 
-	<body>
+        {% block body %}
         <a href="/add_post/">Add post</a>
-        
+        <div class="container">
         {% for post in posts %}
+        
                 <div class="{{post.status}}">       
                          
                          <p data-id="{{post.id}}" contenteditable="false">{{post.body}}</p>
@@ -20,12 +12,18 @@
                          <p>{{post.comment}}</p>         
                          
                          <!--<a href="/{{post.id}}/edit/">Edit post</a>-->
-                         <span class="activate" data-id="{{post.id}}">Edit</span>
-                         <span class="save" data-id="{{post.id}}">Save</span>
-                         <span class="delete" data-id="{{post.id}}">Delete</span>
-                </div>
+                         <ul>
+                                 <li class="activate" data-id="{{post.id}}">Edit</li>
+                                 <li class="save" data-id="{{post.id}}">Save</li>
+                                 <li class="delete" data-id="{{post.id}}">Delete</li>
+                                 <li class="toTODO" data-id="{{post.id}}">TODO</li>
+                                 <li class="toWIP" data-id="{{post.id}}">WIP</li>
+                                 <li class="toDONE" data-id="{{post.id}}">DONE</li>
+                        </ul>
+                </div>                
         {% endfor %}
+        </div>
+        
+        {% endblock %}
 
-	</body>
-        <script src="{{url_for('static', filename='scripts.js')}}"></script>
-</html>
+	
