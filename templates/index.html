@@ -19,8 +19,10 @@
                          <p>{{post.post_time}}</p>
                          <p>{{post.comment}}</p>         
                          
-                         <a href="/{{post.id}}/edit/">Edit post</a>
-                         <span class="activate" data-id="{{post.id}}">live edit</span>
+                         <!--<a href="/{{post.id}}/edit/">Edit post</a>-->
+                         <span class="activate" data-id="{{post.id}}">Edit</span>
+                         <span class="save" data-id="{{post.id}}">Save</span>
+                         <span class="delete" data-id="{{post.id}}">Delete</span>
                 </div>
         {% endfor %}
 

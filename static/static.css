@@ -19,7 +19,11 @@ div {
     background-color: orange;
 }
 
-.activate {
+.activate, .save, .delete {
     cursor: pointer;
     color: #fff;
+}
+
+span {
+    margin: 30px;
 }

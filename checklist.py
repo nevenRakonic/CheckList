@@ -36,7 +36,7 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-#VIEWS
+#ROUTES
 @app.route('/')
 def home():
     posts = query_db('SELECT * FROM posts ORDER BY post_time DESC;')
@@ -86,17 +86,32 @@ def edit_post(post_num):
 
     return render_template('edit.html', text=text, post_num=post_num)
 
-@app.route('/edit/')
+#ajax uses this edit function
+@app.route('/edit')
 def edit():
     db = get_db()
 
     body = request.args.get('body', "default", type=unicode)
+    data_id = request.args.get('id', "-1", type=str)  #TEST THIS PART!!
     body = body.encode('utf-8')
-    print "inside GET"
-    print body
-    db.execute('UPDATE posts SET body="{0}" WHERE ID=7'.format(body))
+
+    db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, data_id))
     db.commit()
+
     return jsonify(result=body)
+
+#ajax uses this delete function
+@app.route('/delete')
+def delete():
+    db = get_db()
+
+    data_id = request.args.get('id', "Null", type=str)
+
+    db.execute('DELETE FROM posts WHERE ID=%s' % data_id)
+    db.commit()
+
+    return jsonify(result=None) #needs to return something, so it only returns empty data
+
 
 if __name__ == '__main__':
     app.run()
