@@ -87,18 +87,24 @@ def edit_post(post_num):
     return render_template('edit.html', text=text, post_num=post_num)
 
 #ajax uses this edit function
-@app.route('/edit')
+@app.route('/edit', methods=['GET', 'POST'])
 def edit():
-    db = get_db()
 
-    body = request.args.get('body', "default", type=unicode)
-    data_id = request.args.get('id', "-1", type=str)  #TEST THIS PART!!
-    body = body.encode('utf-8')
+    if request.method == 'POST':
+        db = get_db()
 
-    db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, data_id))
-    db.commit()
+        data = request.get_json()
 
-    return jsonify(result=body)
+        #print data
+        body = data["body"]
+        data_id = data["id"]
+        #body = body.encode('utf-8')
+
+        db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, data_id))
+        db.commit()   
+         
+
+        return jsonify(result=body)
 
 #ajax uses this delete function
 @app.route('/delete')

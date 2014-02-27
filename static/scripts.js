@@ -1,6 +1,6 @@
 $(function () {
     //ajax call to edit
-    var submit_post = function (to_edit, id) {
+    function submit_post(to_edit, id) {
       $.getJSON($SCRIPT_ROOT + '/edit', {
         body: $(to_edit).text(),
         id: id
@@ -19,6 +19,23 @@ $(function () {
       });
       return false;
     };
+
+    //post test
+    function submit_new(to_edit, id){
+        $.ajax({
+        type: "POST",
+        url: "/edit",
+        data: JSON.stringify({body: $(to_edit).text(), id: id}),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(data){
+            $(to_edit).text(data.result);
+        },
+        failure: function() {
+            console.log("you dun goofed");
+        }
+  });
+    }
     
 
     //activates text editing on click   
@@ -41,7 +58,7 @@ $(function () {
         var set_color = $(to_edit).closest("div").css("background-color");
         $(to_edit).css("background-color", set_color);
 
-        submit_post(to_edit, id);
+        submit_new(to_edit, id);
     });
 
     //deletes entry
