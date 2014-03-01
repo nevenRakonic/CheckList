@@ -87,36 +87,47 @@ def edit_post(post_num):
     return render_template('edit.html', text=text, post_num=post_num)
 
 #ajax uses this edit function
-@app.route('/edit', methods=['GET', 'POST'])
-def edit():
+@app.route('/edit', methods=['POST'])
+def edit():    
+    db = get_db()
 
-    if request.method == 'POST':
-        db = get_db()
+    data = request.get_json()
+   
+    body = data["body"]
+    data_id = data["id"]
+    
 
-        data = request.get_json()
+    db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, data_id))
+    db.commit()         
 
-        #print data
-        body = data["body"]
-        data_id = data["id"]
-        #body = body.encode('utf-8')
-
-        db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, data_id))
-        db.commit()   
-         
-
-        return jsonify(result=body)
+    return jsonify(result=body)
 
 #ajax uses this delete function
-@app.route('/delete')
+@app.route('/delete', methods=['POST'])
 def delete():
     db = get_db()
 
-    data_id = request.args.get('id', "Null", type=str)
+    data = request.get_json()
+    data_id = data["id"]
 
     db.execute('DELETE FROM posts WHERE ID=%s' % data_id)
     db.commit()
 
     return jsonify(result=None) #needs to return something, so it only returns empty data
+
+@app.route('/status', methods=['POST'])
+def change_status():
+    db = get_db()
+
+    data = request.get_json()
+    data_id = data["id"]
+    status = data["status"]
+    print status
+
+    db.execute('UPDATE posts SET status="{0}" WHERE ID={1}'.format(status, data_id))
+    db.commit()
+
+    return jsonify(result=None)
 
 
 if __name__ == '__main__':
