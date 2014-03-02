@@ -1,16 +1,4 @@
 $(function () {
-    
-    //ajax call to delete    
-    /*
-    var delete_post = function (id, div) {
-        $.getJSON($SCRIPT_ROOT + '/delete', {        
-        id: id        
-      },function (data) {
-        $(div).hide("slow");        
-      });
-      return false;
-    };
-    */
 
     //ajax call to edit
     //to_edit is a string that targets data-id

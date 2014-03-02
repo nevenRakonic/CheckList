@@ -63,12 +63,12 @@ def add_post():
 
     return render_template('add_post.html')
 
-@app.route('/<post_num>/showpost/')
+@app.route('/<post_num>/show_post/')
 def show_post(post_num):
     db = get_db()
 
-    post = query_db('SELECT * FROM POSTS WHERE ID=%s' % post_num)
-    return render_template('index.html', posts=post, edit=True)
+    post = query_db('SELECT * FROM POSTS WHERE ID=%s' % post_num, one=True)    
+    return render_template('post_fragment.html', post=post)
 
 #add editing ability
 @app.route('/<post_num>/edit/', methods=['GET', 'POST'])
@@ -128,6 +128,8 @@ def change_status():
     db.commit()
 
     return jsonify(result=None)
+
+# MAYBE ADD ID TO DIV THAT CONTAIN POST ONLY AND THEN PULL EVERYTHING ELSE IN JQUERY?
 
 
 if __name__ == '__main__':
