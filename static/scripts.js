@@ -38,16 +38,15 @@ $(function () {
     }
 
     //ajax call to status
-    function change_status(status, instance, id){
+    function change_status(status, target, id){
         $.ajax({
             type: "POST",
             url: "/status",
             data: JSON.stringify({status: status, id:id}),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: function(data){
-                console.log(status);
-                $(instance).parent().parent().prop("class", status); //chaining parents to fetch the grandparent of the element
+            success: function(data){                
+                $(target).prop("class", status); //chaining parents to fetch the grandparent of the element
             },
             failure: function(data){
                 console.log("status change failed on id: " + id);
@@ -62,7 +61,7 @@ $(function () {
     $(".activate").click(function () {
 
         var id = $(this).data("id");
-        var to_edit = "p[data-id='" + id + "']";
+        var to_edit = "div[data-id='" + id + "'] p:first-child";
 
         $(to_edit).css("background-color", "white");
               
@@ -83,11 +82,8 @@ $(function () {
 
     //deletes entry
     $(".delete").click(function () {
-        var id = $(this).parent().parent().data("id");
-        console.log(id)
-        var target = "div[data-id='" + id + "']";
-
-        //var parent = $(to_edit).parent();
+        var id = $(this).parent().parent().data("id");        
+        var target = "div[data-id='" + id + "']";        
 
         delete_post(target, id);
 
@@ -97,9 +93,11 @@ $(function () {
 
     $(".toTODO, .toWIP, .toDONE").click(function () {
 
-        var id = $(this).data("id");
-        var status = $(this).text();        
-        change_status(status, this, id);
+        var id = $(this).parent().parent().data("id");
+        var target = "div[data-id='" + id + "']";        
+        var status = $(this).text();
+
+        change_status(status, target, id);
 
     });
    
