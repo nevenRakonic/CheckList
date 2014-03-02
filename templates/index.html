@@ -1,28 +1,29 @@
 {% extends "base.html" %}
 
-        {% block body %}
+{% block body %}
+
         <a href="/add_post/">Add post</a>
         <div class="container">
         {% for post in posts %}
         
-                <div class="{{post.status}}">       
+                <div class="{{post.status}}" data-id="{{post.id}}">       
                          
-                         <p data-id="{{post.id}}" contenteditable="false">{{post.body}}</p>
+                         <p contenteditable="false">{{post.body}}</p>
                          <p>{{post.post_time}}</p>
                          <p>{{post.comment}}</p>         
                                                   
                          <ul>
-                                 <li class="activate" data-id="{{post.id}}">Edit</li>
-                                 <li class="save" data-id="{{post.id}}">Save</li>
-                                 <li class="delete" data-id="{{post.id}}">Delete</li>
-                                 <li class="toTODO" data-id="{{post.id}}">TODO</li>
-                                 <li class="toWIP" data-id="{{post.id}}">WIP</li>
-                                 <li class="toDONE" data-id="{{post.id}}">DONE</li>
+                                 <li class="activate">Edit</li>
+                                 <li class="save">Save</li>
+                                 <li class="delete">Delete</li>
+                                 <li class="toTODO">TODO</li>
+                                 <li class="toWIP">WIP</li>
+                                 <li class="toDONE">DONE</li>
                         </ul>
                 </div>                
         {% endfor %}
         </div>
         
-        {% endblock %}
+{% endblock %}
 
 	

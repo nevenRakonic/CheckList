@@ -21,7 +21,7 @@ $(function () {
 
     //ajax call to delete
     //div is the parent div that needs to be deleted
-    function delete_post(div ,id){
+    function delete_post(target ,id){
         $.ajax({
             type: "POST",
             url: "/delete",
@@ -29,7 +29,7 @@ $(function () {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function(data){                
-                $(div).hide("slow");
+                $(target).hide("slow");
             },
             failure: function(data){
                 console.log("delete failed on id: " + id)
@@ -83,12 +83,13 @@ $(function () {
 
     //deletes entry
     $(".delete").click(function () {
-        var id = $(this).data("id");
-        var to_edit = "p[data-id='" + id + "']";
+        var id = $(this).parent().parent().data("id");
+        console.log(id)
+        var target = "div[data-id='" + id + "']";
 
-        var parent = $(to_edit).parent();
+        //var parent = $(to_edit).parent();
 
-        delete_post(parent, id);
+        delete_post(target, id);
 
     });
 
