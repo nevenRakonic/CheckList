@@ -6,11 +6,15 @@
         <div class="container">
         {% for post in posts %}
         
-                <div class="{{post.status}}" data-id="{{post.id}}">       
+                <div class="{{post.status}}" data-id="{{post.id}}">      
+
+                        <div class="post_content"> 
                          
-                         <p contenteditable="false">{{post.body}}</p>
-                         <p>{{post.post_time}}</p>
-                         <p>{{post.comment}}</p>         
+                                <p contenteditable="false">{{post.body}}</p>
+                                <p>{{post.post_time}}</p>
+                                <p>{{post.comment}}</p>  
+
+                        </div>       
                                                   
                          <ul>
                                  <li class="activate">Edit</li>

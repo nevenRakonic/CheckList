@@ -3,15 +3,15 @@ $(function () {
     //ajax call to edit
     //to_edit is a string that targets data-id
     //id is the data-id of the post    
-    function submit_post(to_edit, id){
+    function submit_post(target, id){
         $.ajax({
             type: "POST",
             url: "/edit",
-            data: JSON.stringify({body: $(to_edit).text(), id: id}),
+            data: JSON.stringify({body: $(target + " p:first-child").text(), id: id}),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function(data){                
-                $(to_edit).text(data.result);
+                $(target + " .post_content").load("/" + id + "/show_post");
             },
             failure: function() {
                 console.log("edit failed on id: " + id);
@@ -60,24 +60,24 @@ $(function () {
     //activates text editing on click   
     $(".activate").click(function () {
 
-        var id = $(this).data("id");
-        var to_edit = "div[data-id='" + id + "'] p:first-child";
+        var id = $(this).parent().parent().data("id");
+        var target = "div[data-id='" + id + "'] p:first-child";
 
-        $(to_edit).css("background-color", "white");
+        $(target).css("background-color", "white");
               
-        $(to_edit).prop("contenteditable","true").focus();
+        $(target).prop("contenteditable","true").focus();
         
     });
 
     //saves text editing
     $(".save").click(function () {
-        var id = $(this).data("id");
-        var to_edit = "p[data-id='" + id + "']";
+        var id = $(this).parent().parent().data("id");
+        var target = "div[data-id='" + id + "']"; 
 
-        var set_color = $(to_edit).closest("div").css("background-color");
-        $(to_edit).css("background-color", set_color);
+        //var set_color = $(to_edit).closest("div").css("background-color");
+        //$(to_edit).css("background-color", set_color);
 
-        submit_post(to_edit, id);
+        submit_post(target, id);
     });
 
     //deletes entry

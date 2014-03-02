@@ -63,7 +63,8 @@ def add_post():
 
     return render_template('add_post.html')
 
-@app.route('/<post_num>/show_post/')
+#ajax calls ti fill out new post fragments
+@app.route('/<post_num>/show_post')
 def show_post(post_num):
     db = get_db()
 
