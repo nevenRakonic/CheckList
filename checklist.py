@@ -42,7 +42,7 @@ def home():
     posts = query_db('SELECT * FROM posts ORDER BY post_time DESC;')
     return render_template('index.html', posts=posts)
 
-@app.route('/add_post/', methods=['GET','POST'])
+@app.route('/add_post', methods=['GET','POST'])
 def add_post():
     if request.method == 'POST':
         db = get_db()
@@ -63,7 +63,7 @@ def add_post():
 
     return render_template('add_post.html')
 
-#ajax calls ti fill out new post fragments
+#ajax calls this to fill out new post fragments
 @app.route('/<post_num>/show_post')
 def show_post(post_num):
     db = get_db()
@@ -101,7 +101,7 @@ def edit():
     db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, data_id))
     db.commit()         
 
-    return jsonify(result=body)
+    return jsonify(result=None)
 
 #ajax uses this delete function
 @app.route('/delete', methods=['POST'])
@@ -122,16 +122,12 @@ def change_status():
 
     data = request.get_json()
     data_id = data["id"]
-    status = data["status"]
-    print status
+    status = data["status"]    
 
     db.execute('UPDATE posts SET status="{0}" WHERE ID={1}'.format(status, data_id))
     db.commit()
 
     return jsonify(result=None)
-
-# MAYBE ADD ID TO DIV THAT CONTAIN POST ONLY AND THEN PULL EVERYTHING ELSE IN JQUERY?
-
 
 if __name__ == '__main__':
     app.run()

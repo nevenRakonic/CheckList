@@ -2,7 +2,28 @@
 
 {% block body %}
 
-        <a href="/add_post/">Add post</a>
+        <p id="add_post">Add post</p>
+        <div id="post_area">
+                <form action="/add_post" method="POST">   
+                
+                    <label>Body</label>
+                    <input name="body">
+                    <br/>
+
+                    <label>Comment</label>
+                    <input name="comment">
+                    <br/>
+
+                    <label>Status</label>
+                    <input type="radio" name="status" value="WIP">WIP<br>
+                    <input type="radio" name="status" value="DONE">DONE<br>
+                    <input type="radio" name="status" value="TODO">TODO
+                    <br />
+
+                    <input type="submit" value="Add post">
+                </form>
+        </div>
+
         <div class="container">
         {% for post in posts %}
         
