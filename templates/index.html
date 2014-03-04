@@ -3,11 +3,12 @@
 {% block body %}
 
         <p id="add_post">Add post</p>
+        {% autoescape false %}
         <div id="post_area">
                 <form action="/add_post" method="POST">   
                 
                     <label>Body</label>
-                    <input name="body">
+                    <textarea class="tinyMCE" name="body"></textarea>
                     <br/>
 
                     <label>Comment</label>
@@ -23,6 +24,7 @@
                     <input type="submit" value="Add post">
                 </form>
         </div>
+
 
         <div class="container">
         {% for post in posts %}
@@ -48,6 +50,7 @@
                 </div>                
         {% endfor %}
         </div>
+        {% endautoescape %}
         
 {% endblock %}
 

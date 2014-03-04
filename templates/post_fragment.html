@@ -1,5 +1,7 @@
- <div class="post_content">
-        <p data-id="{{post.id}}" contenteditable="false">{{post.body}}</p>
-        <p>{{post.post_time}}</p>
-        <p>{{post.comment}}</p>
- </div>
+{% autoescape false %}
+     <div class="post_content">
+            <p data-id="{{post.id}}" contenteditable="false">{{post.body}}</p>
+            <p>{{post.post_time}}</p>
+            <p>{{post.comment}}</p>
+     </div>
+ {% endautoescape %}

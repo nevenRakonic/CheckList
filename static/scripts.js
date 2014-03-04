@@ -7,7 +7,7 @@ $(function() {
             type: "POST",
             url: "/edit",
             data: JSON.stringify({
-                body: $(target + " p:first-child").text(),
+                body: $(target + " p:first-child").html(),
                 id: id
             }),
             contentType: "application/json; charset=utf-8",
@@ -51,26 +51,36 @@ $(function() {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function(data) {
-                $(target).prop("class", status); //chaining parents to fetch the grandparent of the element
+                $(target).prop("class", status);
             },
             failure: function(data) {
                 console.log("status change failed on id: " + id);
             }
         });
     }
-    /* EVENT HANDLERS*/
+    /* EVENT HANDLERS */
+    //control variable for editing process
+    var in_edit;
     //activates text editing on click   
     $(".activate").click(function() {
         var id = $(this).closest("div").data("id");
         var target = "div[data-id='" + id + "'] p:first-child";
-        $(target).css("background-color", "white");
-        $(target).prop("contenteditable", "true").focus();
+        //$(target).css("background-color", "white");
+        //$(target).prop("contenteditable", "true").focus();        
+        tinymce.init({
+            selector: target
+        });
+        in_edit = true;
     });
     //saves text editing
     $(".save").click(function() {
-        var id = $(this).closest("div").data("id");
-        var target = "div[data-id='" + id + "']";
-        submit_post(target, id);
+        if (in_edit) {
+            var id = $(this).closest("div").data("id");
+            var target = "div[data-id='" + id + "']";
+            tinyMCE.triggerSave();
+            submit_post(target, id);
+            in_edit = false;
+        }
     });
     //deletes entry
     $(".delete").click(function() {
@@ -90,7 +100,7 @@ $(function() {
     //control variable for add post event handler
     var post_shown;
     //add entry form
-    $("#add_post").click(function() {        
+    $("#add_post").click(function() {
         if (!post_shown) {
             $(this).text("Hide add post");
             $("#post_area").show();
@@ -100,5 +110,9 @@ $(function() {
             $("#post_area").hide();
             post_shown = false;
         }
+        //texteditor
+        tinymce.init({
+            selector: 'textarea.tinyMCE'
+        });
     });
 });
