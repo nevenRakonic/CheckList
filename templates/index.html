@@ -5,8 +5,9 @@
         <p id="add_post">Add post</p>
         {% autoescape false %}
         <div id="post_area">
-                <form action="/add_post" method="POST">   
-                
+                <!-- implement CSRF token here-->
+                <form action="/add_post" method="POST">
+
                     <label>Body</label>
                     <textarea class="tinyMCE" name="body"></textarea>
                     <br/>
@@ -29,18 +30,16 @@
         <div class="container">
         {% for post in posts %}
         
-                <div class="{{post.status}}" data-id="{{post.id}}">      
+                <div class="{{post.status}} activate" data-id="{{post.id}}">      
 
                         <div class="post_content"> 
                          
                                 <p contenteditable="false">{{post.body}}</p>
                                 <p>{{post.post_time}}</p>
-                                <p>{{post.comment}}</p>  
-
+                                <p>{{post.comment}}</p>
                         </div>       
                                                   
                          <ul>
-                                 <li class="activate">Edit</li>
                                  <li class="save">Save</li>
                                  <li class="delete">Delete</li>
                                  <li class="toTODO">TODO</li>

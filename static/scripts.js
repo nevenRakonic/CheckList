@@ -66,22 +66,30 @@ $(function() {
         var id = $(this).closest("div").data("id");
         var target = "div[data-id='" + id + "'] p:first-child";
         //$(target).css("background-color", "white");
-        //$(target).prop("contenteditable", "true").focus();        
-        tinymce.init({
-            selector: target
-        });
-        in_edit = true;
+        $(target).editable('/edit', {
+            type: 'textarea',
+            cancel: 'Cancel',
+            submit: 'OK',
+            tooltip: 'click to edit',
+            submitdata: {
+                post_id: id
+            },
+            data: function(value, settings) {
+                var br2nl = value.replace(/<br[\s\/]?>/gi, '\n');
+                return br2nl;
+            }
+        });        
     });
     //saves text editing
+    /*
     $(".save").click(function() {
         if (in_edit) {
             var id = $(this).closest("div").data("id");
-            var target = "div[data-id='" + id + "']";
-            tinyMCE.triggerSave();
+            var target = "div[data-id='" + id + "']";            
             submit_post(target, id);
             in_edit = false;
         }
-    });
+    });*/
     //deletes entry
     $(".delete").click(function() {
         var id = $(this).closest("div").data("id");
@@ -111,8 +119,8 @@ $(function() {
             post_shown = false;
         }
         //texteditor
-        tinymce.init({
-            selector: 'textarea.tinyMCE'
-        });
+        //tinymce.init({
+        //    selector: 'textarea.tinyMCE'
+        //});
     });
 });
