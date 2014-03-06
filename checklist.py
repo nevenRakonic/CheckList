@@ -2,9 +2,11 @@ import sqlite3
 from datetime import datetime
 from flask import Flask, render_template, request, url_for
 from flask import g, redirect, jsonify
+from flaskext.bcrypt import Bcrypt
 
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 app.config.update(
     DEBUG = True,
     SECRET_KEY = 'oIOXe0CQufWKBR1B',
@@ -41,7 +43,7 @@ def get_current_time():
     return str(datetime.now())[:-7]  #removes miliseconds from time
 
 def check_login(username, password, user):
-    return username == user["username"] and password == user["password"]  
+    return username == user["username"] and bcrypt.check_password_hash(user["password"] ,password)  
 
 #CONTROLLERS
 @app.route('/')
@@ -139,7 +141,7 @@ def change_status():
 def register():
     if request.method == 'POST':
         username = request.form['username']
-        password = request.form['password'] #implement hashing
+        password = bcrypt.generate_password_hash(request.form['password'])         
         join_date = get_current_time()
 
         db = get_db()
@@ -160,14 +162,14 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = query_db(
-            'SELECT username, password FROM users WHERE username="{0}" AND password = "{1}"'.format(username, password),
+            'SELECT username, password FROM users WHERE username="{0}"'.format(username), 
             one=True
-            )
+            )        
 
-        if(user):
+        if user:
             user = dict(user)
             logged_in = check_login(username, password, user)
-        if (logged_in):
+        if logged_in:
             return redirect(url_for('home'))
 
         return "you dun goofed"
