@@ -117,6 +117,7 @@ def edit_post(post_num):
 
 #jeditable uses this edit function
 @app.route('/edit', methods=['POST'])
+@login_required
 def edit():  
     body = request.form['value']
     post_id = request.form['post_id']
@@ -132,6 +133,7 @@ def edit():
 
 #ajax uses this delete function
 @app.route('/delete', methods=['POST'])
+@login_required
 def delete():
     data = request.get_json()    
     data_id = data["id"]
@@ -144,6 +146,7 @@ def delete():
 
 #ajax uses this function to change status
 @app.route('/status', methods=['POST'])
+@login_required
 def change_status():
     data = request.get_json()
     data_id = data["id"]
@@ -191,8 +194,15 @@ def login():
             session["username"] = username
             session["id"] = user["id"]
             return redirect(url_for('home'))
-    
+
     return render_template("login.html")
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    session.pop('id', None)
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run()
