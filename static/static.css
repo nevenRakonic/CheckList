@@ -46,7 +46,7 @@ ul li {
 #add_post {
     cursor: pointer;
 }
-.save, .delete {
+.delete {
     cursor: pointer;
     color: #fff;
 }

@@ -1,25 +1,4 @@
-$(function() {
-    //ajax call to edit
-    //to_edit is a string that targets data-id
-    //id is the data-id of the post    
-    function submit_post(target, id) {
-        $.ajax({
-            type: "POST",
-            url: "/edit",
-            data: JSON.stringify({
-                body: $(target + " p:first-child").html(),
-                id: id
-            }),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function(data) {
-                $(target + " .post_content").load("/" + id + "/show_post");
-            },
-            failure: function() {
-                console.log("edit failed on id: " + id);
-            }
-        });
-    }
+$(function() {    
     //ajax call to delete
     //div is the parent div that needs to be deleted
     function delete_post(target, id) {
@@ -60,8 +39,8 @@ $(function() {
     }
     /* EVENT HANDLERS */
     //control variable for editing process
-    var in_edit;
-    //activates text editing on click   
+    
+    //activates text editing on click, jeditable does the ajax call  
     $(".activate").click(function() {
         var id = $(this).closest("div").data("id");
         var target = "div[data-id='" + id + "'] p:first-child";
@@ -69,7 +48,7 @@ $(function() {
         $(target).editable('/edit', {
             type: 'textarea',
             cancel: 'Cancel',
-            submit: 'OK',
+            submit: 'Save',
             tooltip: 'click to edit',
             submitdata: {
                 post_id: id
@@ -79,17 +58,7 @@ $(function() {
                 return br2nl;
             }
         });        
-    });
-    //saves text editing
-    /*
-    $(".save").click(function() {
-        if (in_edit) {
-            var id = $(this).closest("div").data("id");
-            var target = "div[data-id='" + id + "']";            
-            submit_post(target, id);
-            in_edit = false;
-        }
-    });*/
+    });    
     //deletes entry
     $(".delete").click(function() {
         var id = $(this).closest("div").data("id");
