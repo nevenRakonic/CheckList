@@ -14,7 +14,7 @@ $(function() {
                 $(target).hide("slow");
             },
             failure: function(data) {
-                console.log("delete failed on id: " + id)
+                console.log("delete failed on id: " + id);
             }
         });
     }
@@ -86,10 +86,6 @@ $(function() {
             $(this).text("Add post");
             $("#post_area").hide();
             post_shown = false;
-        }
-        //texteditor
-        //tinymce.init({
-        //    selector: 'textarea.tinyMCE'
-        //});
+        }        
     });
 });
