@@ -1,7 +1,8 @@
 import sqlite3
+from functools import wraps
 from datetime import datetime
 from flask import Flask, render_template, request, url_for
-from flask import g, redirect, jsonify
+from flask import g, redirect, jsonify, session
 from flaskext.bcrypt import Bcrypt
 
 
@@ -38,6 +39,15 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
+#DECORATOR METHODS
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "username" not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 #HELPER METHODS
 def get_current_time():
     return str(datetime.now())[:-7]  #removes miliseconds from time
@@ -47,11 +57,15 @@ def check_login(username, password, user):
 
 #CONTROLLERS
 @app.route('/')
-def home():
-    posts = query_db('SELECT * FROM posts ORDER BY post_time DESC;')    
+@login_required
+def home():    
+    user_id = session["id"]
+    posts = query_db('SELECT * FROM posts WHERE user_id="{0}" ORDER BY post_time DESC;'.format(user_id))    
     return render_template('index.html', posts=posts)
+    
 
 @app.route('/add_post', methods=['GET','POST'])
+@login_required
 def add_post():
     if request.method == 'POST':
         db = get_db()
@@ -59,11 +73,12 @@ def add_post():
         body = request.form['body']
         comment = request.form['comment']
         status = request.form['status']
+        user_id = session["id"]
         post_time = get_current_time()
 
         db.execute(
             'INSERT INTO posts (user_id, body, comment, status, post_time) VALUES (?, ?, ?, ?, ?);',
-             ["Null" ,body, comment, status, post_time]
+             [user_id ,body, comment, status, post_time]
              )
         db.commit()
         #TODO FLASH MESSAGE HERE
@@ -73,6 +88,7 @@ def add_post():
 
 #ajax calls this to fill out new post fragments
 @app.route('/<post_num>/show_post')
+@login_required
 def show_post(post_num):
     db = get_db()
 
@@ -81,7 +97,9 @@ def show_post(post_num):
     return render_template('post_fragment.html', post=post)
 
 #add editing ability
+#LEGACY
 @app.route('/<post_num>/edit/', methods=['GET', 'POST'])
+@login_required
 def edit_post(post_num):
        
     
@@ -162,19 +180,18 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = query_db(
-            'SELECT username, password FROM users WHERE username="{0}"'.format(username), 
+            'SELECT username, password, id FROM users WHERE username="{0}"'.format(username), 
             one=True
             )        
 
         if user:
-            user = dict(user)
+            user = dict(user)   #dict is needed to convert the sqlite.frow object to a dictionary
             logged_in = check_login(username, password, user)
         if logged_in:
+            session["username"] = username
+            session["id"] = user["id"]
             return redirect(url_for('home'))
-
-        return "you dun goofed"
-
-
+    
     return render_template("login.html")
 
 if __name__ == '__main__':
