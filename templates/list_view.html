@@ -4,9 +4,10 @@
 
         <p id="add_post">Add post</p>
         {% autoescape false %}
+        
         <div id="post_area">
                 <!-- implement CSRF token here-->
-                <form action="/add_post" method="POST">
+                <form action="/{{list_name}}/add_post" method="POST">
 
                     <label>Body</label>
                     <textarea name="body"></textarea>
@@ -48,7 +49,8 @@
                         </ul>
                 </div>                
         {% endfor %}
-        </div>
+        </div>       
+        
         {% endautoescape %}
         
 {% endblock %}

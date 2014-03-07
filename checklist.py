@@ -53,30 +53,59 @@ def check_login(username, password, user):
 @app.route('/')
 @login_required
 def home():    
-    user_id = session["id"]
-    posts = query_db('SELECT * FROM posts WHERE user_id="{0}" ORDER BY post_time DESC;'.format(user_id))    
-    return render_template('index.html', posts=posts)
+    username = session["username"]    
+    lists = query_db('SELECT * FROM lists WHERE author="{0}" ORDER BY name DESC;'.format(username))    
+    return render_template('home.html', lists=lists)
+
+@app.route('/add_list', methods=['GET', 'POST'])
+@login_required
+def add_list():
+    if request.method == 'POST':
+        name = request.form['list_name']
+        author = session['username']
+        
+        db = get_db()
+        db.execute(
+            'INSERT INTO lists (name, author) VALUES (?, ?);',
+             [name , author]
+             )
+        db.commit()
+        redirect(url_for('home'))
+    return render_template('add_list.html')
+
+
+@app.route('/<list_name>/')
+@login_required
+def show_list(list_name):    
+    query = """
+    SELECT p.body, l.author, p.comment, p.status, p.id, p.post_time
+    FROM lists l, posts p
+    WHERE p.list_name = l.name
+    AND l.name ="{0}"
+    ORDER BY p.post_time;
+    """
+    posts = query_db(query.format(list_name))    
+    return render_template('list_view.html', posts=posts, list_name=list_name)
     
 
-@app.route('/add_post', methods=['GET','POST'])
+@app.route('/<list_name>/add_post', methods=['GET','POST'])
 @login_required
-def add_post():
+def add_post(list_name):
     if request.method == 'POST':
         db = get_db()
 
         body = request.form['body']
         comment = request.form['comment']
-        status = request.form['status']
-        user_id = session["id"]
+        status = request.form['status']        
         post_time = get_current_time()
 
         db.execute(
-            'INSERT INTO posts (user_id, body, comment, status, post_time) VALUES (?, ?, ?, ?, ?);',
-             [user_id ,body, comment, status, post_time]
+            'INSERT INTO posts (list_name, body, comment, status, post_time) VALUES (?, ?, ?, ?, ?);',
+             [list_name ,body, comment, status, post_time]
              )
         db.commit()
         #TODO FLASH MESSAGE HERE
-        return redirect(url_for('home'))
+        return redirect("/{0}/".format(list_name))
 
     return render_template('add_post.html')
 
@@ -84,8 +113,6 @@ def add_post():
 @app.route('/<post_num>/show_post')
 @login_required
 def show_post(post_num):
-    db = get_db()
-
     post = query_db('SELECT * FROM POSTS WHERE ID=%s' % post_num, one=True)
 
     return render_template('post_fragment.html', post=post)
@@ -191,6 +218,7 @@ def login():
     return render_template("login.html")
 
 @app.route('/logout')
+@login_required
 def logout():    
     session.pop('username', None)
     session.pop('id', None)
