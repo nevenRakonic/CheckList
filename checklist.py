@@ -1,10 +1,10 @@
 import sqlite3
-from functools import wraps
 from datetime import datetime
 from flask import Flask, render_template, request, url_for
-from flask import g, redirect, jsonify, session
+from flask import g, redirect, jsonify, session, flash
 from flaskext.bcrypt import Bcrypt
-
+#my own modules so I can use star for import
+from decorators import *
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -14,7 +14,7 @@ app.config.update(
     DATABASE = 'db/test_db.db'
     )
 
-#DB METHODS
+#DATABSE HELPER METHODS
 def connect_db():
     """Connects to the specific database."""
     rv = sqlite3.connect(app.config['DATABASE'])
@@ -22,31 +22,25 @@ def connect_db():
     return rv
 
 def get_db():
+    """Gets the database object"""
     db = getattr(g,'_database', None)
     if db is None:
         db = g._database = connect_db()
     return db
 
-def query_db(query, args=(), one=False):    
+def query_db(query, args=(), one=False):
+    """Queries database"""    
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
 
+#closes db connection  
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
-
-#DECORATOR METHODS
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if "username" not in session:
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 #HELPER METHODS
 def get_current_time():
@@ -129,7 +123,6 @@ def edit():
     db.commit()        
 
     return body
-    
 
 #ajax uses this delete function
 @app.route('/delete', methods=['POST'])
@@ -185,8 +178,8 @@ def login():
         user = query_db(
             'SELECT username, password, id FROM users WHERE username="{0}"'.format(username), 
             one=True
-            )        
-
+            )
+        
         if user:
             user = dict(user)   #dict is needed to convert the sqlite.frow object to a dictionary
             logged_in = check_login(username, password, user)
@@ -198,10 +191,10 @@ def login():
     return render_template("login.html")
 
 @app.route('/logout')
-def logout():
-    # remove the username from the session if it's there
+def logout():    
     session.pop('username', None)
     session.pop('id', None)
+    flash("Logging out...")
     return redirect(url_for('home'))
 
 if __name__ == '__main__':

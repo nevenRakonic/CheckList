@@ -1,4 +1,5 @@
-$(function() {    
+$(function() {
+    /* AJAX */    
     //ajax call to delete
     //div is the parent div that needs to be deleted
     function delete_post(target, id) {
