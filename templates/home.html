@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <h1>My lists</h1>
+    {% for list in lists %}
+    <a href="{{list.name}}/">{{list.name}}</a>
+    {% endfor %}
+    <br>
+    <a href="{{url_for('add_list')}}">Add list</a>
+{% endblock %}
