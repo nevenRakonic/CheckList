@@ -3,7 +3,7 @@
 {% block body %}
     <h1>My lists</h1>
     {% for list in lists %}
-    <a href="{{list.name}}/">{{list.name}}</a>
+    <a href="{{list.id}}/">{{list.name}}</a>
     {% endfor %}
     <br>
     <a href="{{url_for('add_list')}}">Add list</a>

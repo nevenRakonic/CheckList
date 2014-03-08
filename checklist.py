@@ -74,23 +74,42 @@ def add_list():
     return render_template('add_list.html')
 
 
-@app.route('/<list_name>/')
+@app.route('/<list_id>/')
 @login_required
-def show_list(list_name):    
+def show_list(list_id):    
     query = """
     SELECT p.body, l.author, p.comment, p.status, p.id, p.post_time
     FROM lists l, posts p
-    WHERE p.list_name = l.name
-    AND l.name ="{0}"
-    ORDER BY p.post_time;
+    WHERE p.list_id = l.id
+    AND l.id ={0}
+    ORDER BY p.post_time DESC;
     """
-    posts = query_db(query.format(list_name))    
-    return render_template('list_view.html', posts=posts, list_name=list_name)
+    posts = query_db(query.format(list_id))    
+    return render_template('list_view.html', posts=posts, list_id=list_id)
+
+@app.route('/<list_id>/add_permision')
+@login_required
+def add_permision(list_id):
+    if request.method == 'POST':
+        username = request.form['username']
+
+        query ="""
+        SELECT username
+        FROM users
+        WHERE username="{0}"
+        """
+        db_username = query_db(query.format(username), one=True)
+
+        #maybe needs to be a dict
+        if username != db_username:
+            redirect ('/' + str(list_id))
+
+
     
 
-@app.route('/<list_name>/add_post', methods=['GET','POST'])
+@app.route('/<list_id>/add_post', methods=['GET','POST'])
 @login_required
-def add_post(list_name):
+def add_post(list_id):
     if request.method == 'POST':
         db = get_db()
 
@@ -100,12 +119,12 @@ def add_post(list_name):
         post_time = get_current_time()
 
         db.execute(
-            'INSERT INTO posts (list_name, body, comment, status, post_time) VALUES (?, ?, ?, ?, ?);',
-             [list_name ,body, comment, status, post_time]
+            'INSERT INTO posts (list_id, body, comment, status, post_time) VALUES (?, ?, ?, ?, ?);',
+             [list_id ,body, comment, status, post_time]
              )
         db.commit()
         #TODO FLASH MESSAGE HERE
-        return redirect("/{0}/".format(list_name))
+        return redirect("/{0}/".format(list_id))
 
     return render_template('add_post.html')
 
