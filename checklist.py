@@ -1,4 +1,5 @@
 import sqlite3
+import constants
 from datetime import datetime
 from flask import Flask, render_template, request, url_for
 from flask import g, redirect, jsonify, session, flash
@@ -36,13 +37,22 @@ def query_db(query, args=(), one=False):
     return (rv[0] if rv else None) if one else rv
 
 def find_username(username):
-    """Checks if username exists"""
-    query ="""
+    """Checks if username exists and returns username"""
+    query = """
         SELECT username
         FROM users
-        WHERE username="{0}"
+        WHERE username="{0}";
         """
     return query_db(query.format(username), one=True)
+
+def find_list(list_id):
+    """Checks if list exists and returns row"""
+    query = """
+    SELECT *
+    FROM lists
+    WHERE id ={0};
+    """
+    return query_db(query.format(list_id), one=True);
 
 #closes db connection  
 @app.teardown_appcontext
@@ -58,16 +68,30 @@ def get_current_time():
 def check_login(username, password, user):
     return username == user["username"] and bcrypt.check_password_hash(user["password"] ,password)
 
-
-
-
 #CONTROLLERS
 @app.route('/')
 @login_required
 def home():    
-    username = session["username"]    
-    lists = query_db('SELECT * FROM lists WHERE author="{0}" ORDER BY name DESC;'.format(username))    
-    return render_template('home.html', lists=lists)
+    username = session["username"]
+
+    own_query = """
+    SELECT * 
+    FROM lists 
+    WHERE author="{0}" 
+    ORDER BY name DESC;
+    """
+    own_lists = query_db(own_query.format(username))
+
+    others_query = """
+    SELECT l.name, l.id, l.author
+    FROM lists l, permissions p, users u
+    WHERE  u.id = p.user_id
+    AND l.id = p.list_id
+    AND u.username = "{0}";
+    """
+    others_lists = query_db(others_query.format(username))
+
+    return render_template('home.html', own_lists=own_lists, others_lists=others_lists)
 
 @app.route('/add_list', methods=['GET', 'POST'])
 @login_required
@@ -88,7 +112,31 @@ def add_list():
 
 @app.route('/<int:list_id>/')
 @login_required
-def show_list(list_id):    
+def show_list(list_id):
+    user_id = session["id"]
+
+    temp_list = find_list(list_id)
+    if not temp_list:
+        flash(constants.EXIST_AUTHORIZE_W)
+        return redirect(url_for('home'))
+
+    #MIGHT NEED TO REFACTOR TO ALWAYS LOOK FOR USER ID!
+    temp_list = dict(temp_list)
+    print str(temp_list) +" --- INSIDE SHOW LIST"
+    if not temp_list["author"] == session["username"]:
+
+        pquery ="""
+        SELECT p.user_id
+        FROM lists l, permissions p
+        WHERE l.id = {0}
+        AND p.list_id=l.id;
+        """
+        authorized = query_db(pquery.format(list_id))
+        print str(authorized[0]) +" --- INSIDE SHOW LIST"
+        if not authorized or not user_id in authorized[0]:
+            flash(constants.EXIST_AUTHORIZE_W)
+            return redirect(url_for('home'))
+
     query = """
     SELECT p.body, l.author, p.comment, p.status, p.id, p.post_time
     FROM lists l, posts p
@@ -105,8 +153,9 @@ def show_list(list_id):
 def add_permission(list_id):
     if request.method == 'POST':
         username = request.form['username']
-        db_username = find_username(username)                  
-
+        print str(username) + " --- INSIDE ADD_PERMISSION"
+        db_username = find_username(username)
+        print str(db_username) + " --- INSIDE ADD_PERMISSION"
         
         if not db_username or username != db_username[0]:
             flash("user doesn't exist")

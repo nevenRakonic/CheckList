@@ -19,6 +19,13 @@
                 </ul>
               {% endif %}
             {% endwith %}
+
+            {% if session["username"] %}
+            <p>Logged in as: {{session["username"]}}</p>
+            <a href="{{url_for('logout')}}">Logout<a>
+            {% endif %}
+            
+
             {% block body %}
             {% endblock %}
         </body>
