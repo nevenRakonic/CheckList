@@ -1,11 +1,15 @@
 $(function() {
+    /* GLOBALS */
+    //list id is the same for all posts and actions, so it can be global and loaded once
+    var list_id = $(".container").data("list-id");
+
     /* AJAX */    
     //ajax call to delete
     //div is the parent div that needs to be deleted
     function delete_post(target, id) {
         $.ajax({
             type: "POST",
-            url: "/delete",
+            url: "/" + list_id + "/delete",
             data: JSON.stringify({
                 id: id
             }),
@@ -23,7 +27,7 @@ $(function() {
     function change_status(status, target, id) {
         $.ajax({
             type: "POST",
-            url: "/status",
+            url: "/" + list_id + "/status",
             data: JSON.stringify({
                 status: status,
                 id: id
@@ -39,20 +43,18 @@ $(function() {
         });
     }
     /* EVENT HANDLERS */
-    //control variable for editing process
-    
     //activates text editing on click, jeditable does the ajax call  
-    $(".activate").click(function() {
+    $(".activate").click(function() {        
         var id = $(this).closest("div").data("id");
         var target = "div[data-id='" + id + "'] p:first-child";
         //$(target).css("background-color", "white");
-        $(target).editable('/edit', {
+        $(target).editable('/' + list_id + '/edit', {
             type: 'textarea',
             cancel: 'Cancel',
             submit: 'Save',
             tooltip: 'click to edit',
             submitdata: {
-                post_id: id
+                post_id: id,                
             },
             data: function(value, settings) {
                 var br2nl = value.replace(/<br[\s\/]?>/gi, '\n');

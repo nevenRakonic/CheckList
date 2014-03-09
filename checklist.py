@@ -54,6 +54,30 @@ def find_list(list_id):
     """
     return query_db(query.format(list_id), one=True);
 
+def get_permissions(user_id, username):
+    
+    """Returns IDs of posts that the user has permissions for"""
+    other_query = """
+    SELECT list_id
+    FROM permissions
+    WHERE user_id = {0};
+    """
+
+    self_query = """
+    SELECT id
+    FROM lists
+    WHERE author = "{0}";
+    """
+
+    #list comprehension pulls out ids from sqlite.row object
+    self_results = query_db(self_query.format(username))
+    self_results = [l[0] for l in self_results]
+    other_results = query_db(other_query.format(user_id)) 
+    results = [l[0] for l in other_results]
+    results.extend(self_results)
+    
+    return results
+
 #closes db connection  
 @app.teardown_appcontext
 def close_connection(exception):
@@ -89,8 +113,8 @@ def home():
     AND l.id = p.list_id
     AND u.username = "{0}";
     """
-    others_lists = query_db(others_query.format(username))
 
+    others_lists = query_db(others_query.format(username))    
     return render_template('home.html', own_lists=own_lists, others_lists=others_lists)
 
 @app.route('/add_list', methods=['GET', 'POST'])
@@ -121,19 +145,9 @@ def show_list(list_id):
         return redirect(url_for('home'))
 
     #MIGHT NEED TO REFACTOR TO ALWAYS LOOK FOR USER ID!
-    temp_list = dict(temp_list)
-    print str(temp_list) +" --- INSIDE SHOW LIST"
-    if not temp_list["author"] == session["username"]:
-
-        pquery ="""
-        SELECT p.user_id
-        FROM lists l, permissions p
-        WHERE l.id = {0}
-        AND p.list_id=l.id;
-        """
-        authorized = query_db(pquery.format(list_id))
-        print str(authorized[0]) +" --- INSIDE SHOW LIST"
-        if not authorized or not user_id in authorized[0]:
+    temp_list = dict(temp_list)    
+    if not temp_list["author"] == session["username"]:      #checks if the list was created by the user
+        if not list_id in session["permissions"]:           #checks if user has permissions for other people's lists     
             flash(constants.EXIST_AUTHORIZE_W)
             return redirect(url_for('home'))
 
@@ -152,12 +166,10 @@ def show_list(list_id):
 @login_required
 def add_permission(list_id):
     if request.method == 'POST':
-        username = request.form['username']
-        print str(username) + " --- INSIDE ADD_PERMISSION"
-        db_username = find_username(username)
-        print str(db_username) + " --- INSIDE ADD_PERMISSION"
+        username = request.form['username']        
+        db_username = find_username(username)     
         
-        if not db_username or username != db_username[0]:
+        if not db_username:
             flash("user doesn't exist")
             return redirect ('/' + str(list_id) + '/')
 
@@ -193,7 +205,7 @@ def add_post(list_id):
              [list_id ,body, comment, status, post_time]
              )
         db.commit()
-        #TODO FLASH MESSAGE HERE
+        #TODO FLASH MESSAGE HERE        
         return redirect("/{0}/".format(list_id))
 
     return render_template('add_post.html')
@@ -208,61 +220,66 @@ def show_post(post_num):
 
 #add editing ability
 #LEGACY
-@app.route('/<int:post_num>/edit/', methods=['GET', 'POST'])
-@login_required
-def edit_post(post_num):    
-    if request.method == 'POST':
-        text = request.form['text']
+# @app.route('/<int:list_id>/edit/', methods=['GET', 'POST'])
+# @login_required
+# def edit_post(post_num):    
+#     if request.method == 'POST':
+#         text = request.form['text']
 
-        db = get_db()
-        db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(text, post_num))
-        db.commit()
-        #return redirect(url_for('home'))
+#         db = get_db()
+#         db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(text, post_num))
+#         db.commit()
+#         #return redirect(url_for('home'))
 
-    text = query_db('SELECT body FROM posts WHERE ID=%s' % post_num, one=True)    
+#     text = query_db('SELECT body FROM posts WHERE ID=%s' % post_num, one=True)    
 
-    return render_template('edit.html', text=text, post_num=post_num)
+#     return render_template('edit.html', text=text, post_num=post_num)
 
 #jeditable uses this edit function
-@app.route('/edit', methods=['POST'])
+@app.route('/<int:list_id>/edit', methods=['POST'])
 @login_required
-def edit():  
-    body = request.form['value']
-    post_id = request.form['post_id']
-    body = "<br />".join(body.split("\n"))
-    
-     
-    db = get_db()
-    db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, post_id))
-    db.commit()        
+def edit(list_id):
+    if list_id in session["permissions"]:
+        body = request.form['value']
+        post_id = request.form['post_id']    
+        body = "<br>".join(body.split("\n"))
+        
+         
+        db = get_db()
+        db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, post_id))
+        db.commit()        
 
-    return body
+        return body
 
 #ajax uses this delete function
-@app.route('/delete', methods=['POST'])
+@app.route('/<int:list_id>/delete', methods=['POST'])
 @login_required
-def delete():
-    data = request.get_json()    
-    data_id = data["id"]
+def delete(list_id):
+    if list_id in session["permissions"]:
+        data = request.get_json()    
+        data_id = data["id"]
 
-    db = get_db()
-    db.execute('DELETE FROM posts WHERE ID=%s' % data_id)
-    db.commit()
+        db = get_db()
+        db.execute('DELETE FROM posts WHERE ID=%s' % data_id)
+        db.commit()
 
-    return jsonify(result=None) #needs to return something, so it only returns empty data
+        return jsonify(result=None) #needs to return something, so it only returns empty data
 
 #ajax uses this function to change status
-@app.route('/status', methods=['POST'])
+@app.route('/<int:list_id>/status', methods=['POST'])
 @login_required
-def change_status():
-    data = request.get_json()
-    data_id = data["id"]
-    status = data["status"]    
+def change_status(list_id):    
+    if list_id in session["permissions"]:
+        data = request.get_json()
+        
+        data_id = data["id"]
+        status = data["status"]    
 
-    db = get_db()
-    db.execute('UPDATE posts SET status="{0}" WHERE ID={1}'.format(status, data_id))
-    db.commit()
+        db = get_db()
+        db.execute('UPDATE posts SET status="{0}" WHERE ID={1}'.format(status, data_id))
+        db.commit()
 
+        return jsonify(result=None)
     return jsonify(result=None)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -300,6 +317,8 @@ def login():
         if logged_in:
             session["username"] = username
             session["id"] = user["id"]
+            session["permissions"] = get_permissions(session["id"], username)
+            
             return redirect(url_for('home'))
 
     return render_template("login.html")
