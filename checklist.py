@@ -45,15 +45,6 @@ def find_username(username):
         """
     return query_db(query.format(username), one=True)
 
-def find_list(list_id):
-    """Checks if list exists and returns row"""
-    query = """
-    SELECT *
-    FROM lists
-    WHERE id ={0};
-    """
-    return query_db(query.format(list_id), one=True);
-
 def get_permissions(user_id, username):
     
     """Returns IDs of posts that the user has permissions for"""
@@ -136,21 +127,8 @@ def add_list():
 
 @app.route('/<int:list_id>/')
 @login_required
-def show_list(list_id):
-    user_id = session["id"]
-
-    temp_list = find_list(list_id)
-    if not temp_list:
-        flash(constants.EXIST_AUTHORIZE_W)
-        return redirect(url_for('home'))
-
-    #MIGHT NEED TO REFACTOR TO ALWAYS LOOK FOR USER ID!
-    temp_list = dict(temp_list)    
-    if not temp_list["author"] == session["username"]:      #checks if the list was created by the user
-        if not list_id in session["permissions"]:           #checks if user has permissions for other people's lists     
-            flash(constants.EXIST_AUTHORIZE_W)
-            return redirect(url_for('home'))
-
+@permissions_required
+def show_list(list_id):   
     query = """
     SELECT p.body, l.author, p.comment, p.status, p.id, p.post_time
     FROM lists l, posts p
@@ -164,6 +142,7 @@ def show_list(list_id):
 
 @app.route('/<int:list_id>/add_permission', methods=['GET', 'POST'])
 @login_required
+@permissions_required
 def add_permission(list_id):
     if request.method == 'POST':
         username = request.form['username']        
@@ -191,6 +170,7 @@ def add_permission(list_id):
 
 @app.route('/<int:list_id>/add_post', methods=['GET','POST'])
 @login_required
+@permissions_required
 def add_post(list_id):
     if request.method == 'POST':
         db = get_db()
@@ -210,9 +190,11 @@ def add_post(list_id):
 
     return render_template('add_post.html')
 
+#LEGACY?
 #ajax calls this to fill out new post fragments
 @app.route('/<int:post_num>/show_post')
 @login_required
+@permissions_required
 def show_post(post_num):
     post = query_db('SELECT * FROM POSTS WHERE ID=%s' % post_num, one=True)
 
@@ -238,22 +220,23 @@ def show_post(post_num):
 #jeditable uses this edit function
 @app.route('/<int:list_id>/edit', methods=['POST'])
 @login_required
-def edit(list_id):
-    if list_id in session["permissions"]:
-        body = request.form['value']
-        post_id = request.form['post_id']    
-        body = "<br>".join(body.split("\n"))
-        
-         
-        db = get_db()
-        db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, post_id))
-        db.commit()        
+@permissions_required
+def edit(list_id):    
+    body = request.form['value']
+    post_id = request.form['post_id']    
+    body = "<br>".join(body.split("\n"))
+    
+     
+    db = get_db()
+    db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, post_id))
+    db.commit()        
 
-        return body
+    return body
 
 #ajax uses this delete function
 @app.route('/<int:list_id>/delete', methods=['POST'])
 @login_required
+@permissions_required
 def delete(list_id):
     if list_id in session["permissions"]:
         data = request.get_json()    
@@ -268,6 +251,7 @@ def delete(list_id):
 #ajax uses this function to change status
 @app.route('/<int:list_id>/status', methods=['POST'])
 @login_required
+@permissions_required
 def change_status(list_id):    
     if list_id in session["permissions"]:
         data = request.get_json()
@@ -328,7 +312,8 @@ def login():
 def logout():    
     session.pop('username', None)
     session.pop('id', None)
-    flash("Logging out...")
+    session.pop('permissions', None)
+    flash("Logged out...")
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
