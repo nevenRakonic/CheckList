@@ -121,6 +121,8 @@ def add_list():
              [name , author]
              )
         db.commit()
+        session["permissions"] = get_permissions(session["id"], session["username"]) 
+        flash(str(name) + " list added")
         redirect(url_for('home'))
     return render_template('add_list.html')
 
@@ -164,7 +166,12 @@ def add_permission(list_id):
         db = get_db()
         db.execute(query.format(username, list_id))
         db.commit()
+
+        #permissions need to be refreshed
+        
+
         flash("permission added")
+
 
     return render_template('add_permission.html', list_id=list_id)    
 
