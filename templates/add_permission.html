@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+    <form action="/{{list_id}}/add_permission" method="POST">
+
+        <label>Username</label>
+        <input name="username">            
+
+        <input type="submit" value="Add permission">
+    </form>
+{% endblock %}

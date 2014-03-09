@@ -35,6 +35,15 @@ def query_db(query, args=(), one=False):
     cur.close()
     return (rv[0] if rv else None) if one else rv
 
+def find_username(username):
+    """Checks if username exists"""
+    query ="""
+        SELECT username
+        FROM users
+        WHERE username="{0}"
+        """
+    return query_db(query.format(username), one=True)
+
 #closes db connection  
 @app.teardown_appcontext
 def close_connection(exception):
@@ -47,7 +56,10 @@ def get_current_time():
     return str(datetime.now())[:-7]  #removes miliseconds from time
 
 def check_login(username, password, user):
-    return username == user["username"] and bcrypt.check_password_hash(user["password"] ,password)  
+    return username == user["username"] and bcrypt.check_password_hash(user["password"] ,password)
+
+
+
 
 #CONTROLLERS
 @app.route('/')
@@ -74,7 +86,7 @@ def add_list():
     return render_template('add_list.html')
 
 
-@app.route('/<list_id>/')
+@app.route('/<int:list_id>/')
 @login_required
 def show_list(list_id):    
     query = """
@@ -84,30 +96,39 @@ def show_list(list_id):
     AND l.id ={0}
     ORDER BY p.post_time DESC;
     """
+    
     posts = query_db(query.format(list_id))    
     return render_template('list_view.html', posts=posts, list_id=list_id)
 
-@app.route('/<list_id>/add_permision')
+@app.route('/<int:list_id>/add_permission', methods=['GET', 'POST'])
 @login_required
-def add_permision(list_id):
+def add_permission(list_id):
     if request.method == 'POST':
         username = request.form['username']
+        db_username = find_username(username)                  
 
-        query ="""
-        SELECT username
-        FROM users
-        WHERE username="{0}"
+        
+        if not db_username or username != db_username[0]:
+            flash("user doesn't exist")
+            return redirect ('/' + str(list_id) + '/')
+
+        query = """
+        INSERT INTO permissions (user_id, list_id)
+        SELECT u.id, l.id
+        FROM users u, lists l 
+        WHERE u.username = "{0}"
+        AND l.id = {1};
         """
-        db_username = query_db(query.format(username), one=True)
+        
+        #needs exception if user exists in permissions
+        db = get_db()
+        db.execute(query.format(username, list_id))
+        db.commit()
+        flash("permission added")
 
-        #maybe needs to be a dict
-        if username != db_username:
-            redirect ('/' + str(list_id))
+    return render_template('add_permission.html', list_id=list_id)    
 
-
-    
-
-@app.route('/<list_id>/add_post', methods=['GET','POST'])
+@app.route('/<int:list_id>/add_post', methods=['GET','POST'])
 @login_required
 def add_post(list_id):
     if request.method == 'POST':
@@ -129,7 +150,7 @@ def add_post(list_id):
     return render_template('add_post.html')
 
 #ajax calls this to fill out new post fragments
-@app.route('/<post_num>/show_post')
+@app.route('/<int:post_num>/show_post')
 @login_required
 def show_post(post_num):
     post = query_db('SELECT * FROM POSTS WHERE ID=%s' % post_num, one=True)
@@ -138,11 +159,9 @@ def show_post(post_num):
 
 #add editing ability
 #LEGACY
-@app.route('/<post_num>/edit/', methods=['GET', 'POST'])
+@app.route('/<int:post_num>/edit/', methods=['GET', 'POST'])
 @login_required
-def edit_post(post_num):
-       
-    
+def edit_post(post_num):    
     if request.method == 'POST':
         text = request.form['text']
 
