@@ -1,19 +1,26 @@
 {% extends "base.html" %}
-
 {% block body %}
-
-    <form action="/login" method="POST">
-
-        <label>Username</label>
-        <input name="username">
-        <br/>
-
-        <label>Password</label>
-        <input type="password" name="password">
-        <br/>        
-
-        <input type="submit" value="log in">
+<div class="container">
+    <div class="row landing">
+        <h1 class="text-center">Task Tracker</h1>
+        <p class="text-center">A simple task tracking app.</p>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 col-md-6 col-sm-8 col-xs-10 col-centered">
+            <form class="start" role="form" action="/login" method="POST">
+                <h3>Login</h3>
+                <div class="form-group">
+                    <label for="Username">Username</label>
+                    <input class="form-control" name="username" placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <label for="Password">Password</label>
+                    <input class="form-control" type="password" name="password" placeholder="Password">
+                </div>
+                <input class="btn btn-default" type="submit" value="Log in">
+                <p class="help-block">Don't have an account? Register <a href="{{url_for('register')}}">here.</a></p>
+            </div>
+        </div>
     </form>
-    <a href="{{url_for('register')}}">Register</a>
-
+</div>
 {% endblock %}

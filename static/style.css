@@ -1,0 +1,45 @@
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: #2E7C73;
+    color: white;
+}
+
+a {
+    color: #D65A23;
+}
+
+
+.col-centered {
+    float: none;
+    margin: 0 auto;
+}
+.start {
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    border: 2px solid #fff;
+    padding: 10px;
+}
+.landing {
+    margin: 3% 0 3% 0;
+}
+.landing > h1 {
+    font-size: 6em;
+    margin: 0;
+}
+.landing > p {
+    font-size: 24px;
+    margin: 0;
+}
+
+/* Bootstrap overrides */
+.help-block{
+    color: #FFF;
+}
+
+.start > h3 {
+    margin-top: 0px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #FFF;
+}
