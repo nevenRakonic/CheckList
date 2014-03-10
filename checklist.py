@@ -1,10 +1,10 @@
 import sqlite3
-import constants
 from datetime import datetime
 from flask import Flask, render_template, request, url_for
 from flask import g, redirect, jsonify, session, flash
 from flaskext.bcrypt import Bcrypt
 #my own modules so I can use star for import
+import constants
 from decorators import *
 
 app = Flask(__name__)
@@ -41,29 +41,28 @@ def find_username(username):
     query = """
         SELECT username
         FROM users
-        WHERE username="{0}";
+        WHERE username=?;
         """
-    return query_db(query.format(username), one=True)
+    return query_db(query, [username], one=True)
 
-def get_permissions(user_id, username):
-    
+def get_permissions(user_id, username):    
     """Returns IDs of posts that the user has permissions for"""
     other_query = """
     SELECT list_id
     FROM permissions
-    WHERE user_id = {0};
+    WHERE user_id = ?;
     """
 
     self_query = """
     SELECT id
     FROM lists
-    WHERE author = "{0}";
+    WHERE author = ?;
     """
 
     #list comprehension pulls out ids from sqlite.row object
-    self_results = query_db(self_query.format(username))
+    self_results = query_db(self_query, [username])
     self_results = [l[0] for l in self_results]
-    other_results = query_db(other_query.format(user_id)) 
+    other_results = query_db(other_query, [user_id]) 
     results = [l[0] for l in other_results]
     results.extend(self_results)
     
@@ -81,31 +80,33 @@ def get_current_time():
     return str(datetime.now())[:-7]  #removes miliseconds from time
 
 def check_login(username, password, user):
-    return username == user["username"] and bcrypt.check_password_hash(user["password"] ,password)
+    return username == user["username"] and bcrypt.check_password_hash(user["password"], password)
 
 #CONTROLLERS
 @app.route('/')
 @login_required
 def home():    
     username = session["username"]
+    #permissions are refreshed in case somebody else added a list we can see
+    session["permissions"] = get_permissions(session["id"], username)
 
     own_query = """
     SELECT * 
     FROM lists 
-    WHERE author="{0}" 
+    WHERE author = ? 
     ORDER BY name DESC;
     """
-    own_lists = query_db(own_query.format(username))
+    own_lists = query_db(own_query, [username])
 
     others_query = """
     SELECT l.name, l.id, l.author
     FROM lists l, permissions p, users u
     WHERE  u.id = p.user_id
     AND l.id = p.list_id
-    AND u.username = "{0}";
+    AND u.username = ?;
     """
 
-    others_lists = query_db(others_query.format(username))    
+    others_lists = query_db(others_query, [username])    
     return render_template('home.html', own_lists=own_lists, others_lists=others_lists)
 
 @app.route('/add_list', methods=['GET', 'POST'])
@@ -135,11 +136,11 @@ def show_list(list_id):
     SELECT p.body, l.author, p.comment, p.status, p.id, p.post_time
     FROM lists l, posts p
     WHERE p.list_id = l.id
-    AND l.id ={0}
+    AND l.id = ?
     ORDER BY p.post_time DESC;
     """
     
-    posts = query_db(query.format(list_id))    
+    posts = query_db(query, [list_id])    
     return render_template('list_view.html', posts=posts, list_id=list_id)
 
 @app.route('/<int:list_id>/add_permission', methods=['GET', 'POST'])
@@ -158,20 +159,19 @@ def add_permission(list_id):
         INSERT INTO permissions (user_id, list_id)
         SELECT u.id, l.id
         FROM users u, lists l 
-        WHERE u.username = "{0}"
-        AND l.id = {1};
+        WHERE u.username = ?
+        AND l.id = ?;
         """
         
-        #needs exception if user exists in permissions
-        db = get_db()
-        db.execute(query.format(username, list_id))
-        db.commit()
-
-        #permissions need to be refreshed
-        
-
-        flash("permission added")
-
+        #IntegrityError appears because user/list combo must be unique
+        try:
+            db = get_db()
+            db.execute(query, [username, list_id])
+            db.commit()
+        except sqlite3.IntegrityError:
+            flash("user already has permissions")
+        else:
+            flash("permission added")
 
     return render_template('add_permission.html', list_id=list_id)    
 
@@ -203,7 +203,7 @@ def add_post(list_id):
 @login_required
 @permissions_required
 def show_post(post_num):
-    post = query_db('SELECT * FROM POSTS WHERE ID=%s' % post_num, one=True)
+    post = query_db('SELECT * FROM POSTS WHERE ID=?', [post_num], one=True)
 
     return render_template('post_fragment.html', post=post)
 
@@ -235,7 +235,7 @@ def edit(list_id):
     
      
     db = get_db()
-    db.execute('UPDATE posts SET body="{0}" WHERE ID={1}'.format(body, post_id))
+    db.execute('UPDATE posts SET body=? WHERE ID=?', [body, post_id])
     db.commit()        
 
     return body
@@ -250,7 +250,7 @@ def delete(list_id):
         data_id = data["id"]
 
         db = get_db()
-        db.execute('DELETE FROM posts WHERE ID=%s' % data_id)
+        db.execute('DELETE FROM posts WHERE ID=?', [data_id])
         db.commit()
 
         return jsonify(result=None) #needs to return something, so it only returns empty data
@@ -267,7 +267,7 @@ def change_status(list_id):
         status = data["status"]    
 
         db = get_db()
-        db.execute('UPDATE posts SET status="{0}" WHERE ID={1}'.format(status, data_id))
+        db.execute('UPDATE posts SET status=? WHERE ID=?', [status, data_id])
         db.commit()
 
         return jsonify(result=None)
@@ -298,7 +298,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = query_db(
-            'SELECT username, password, id FROM users WHERE username="{0}"'.format(username), 
+            'SELECT username, password, id FROM users WHERE username=?;', [username], 
             one=True
             )
         
