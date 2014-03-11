@@ -1,14 +1,13 @@
-body {
+body .home {
     font-family: 'Lato', sans-serif;
-    background-color: #2E7C73;
-    color: white;
 }
-
 a {
     color: #D65A23;
 }
-
-
+.home {
+    background-color: #2E7C73;
+    color: white;
+}
 .col-centered {
     float: none;
     margin: 0 auto;
@@ -31,12 +30,11 @@ a {
     font-size: 24px;
     margin: 0;
 }
-
 /* Bootstrap overrides */
-.help-block{
+
+.help-block {
     color: #FFF;
 }
-
 .start > h3 {
     margin-top: 0px;
     margin-bottom: 10px;

@@ -1,21 +1,19 @@
 {% extends "base.html" %}
 
 {% block body %}
-
+<body>
+    {% include 'home_navbar.html' %}
     <h1>My lists</h1>
     {% for list in own_lists %}
         <a href="{{list.id}}/">{{list.name}}</a>
         <br>
     {% endfor %}
-    <br>    
-    <a href="{{url_for('add_list')}}">Add list</a>
-    <br>
-
 
     <h1>Others lists</h1>
     {% for list in others_lists %}
         <a href="{{list.id}}/">{{list.name}}</a>
         <br>
     {% endfor %}
+</body>
 
 {% endblock %}

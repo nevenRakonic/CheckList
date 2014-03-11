@@ -133,6 +133,7 @@ def add_list():
         session["permissions"] = get_permissions(session["id"], session["username"])
         flash(str(name) + " list added")
         return redirect(url_for('home'))
+    #TODO Change template routing and check if list with same name exists
     return render_template('add_list.html')
 
 

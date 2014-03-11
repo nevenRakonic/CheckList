@@ -1,51 +1,55 @@
 {% extends "base.html" %}
 {% block body %}
-<p id="add_post">Add post</p>
-<br>
-{% if session["username"] == author %}
-<a href="/{{list_id}}/add_permission">Add permission</a>
-{% endif %}
+
 {% autoescape false %}
+<body>
+    {% include 'flash.html' %}
 
-<div id="post_area">
-    <!-- implement CSRF token here-->
-    <form action="/{{list_id}}/add_post" method="POST">
-        <label>Body</label>
-        <textarea name="body"></textarea>
-        <br/>
-        <label>Comment</label>
-        <input name="comment">
-        <br/>
-        <label>Status</label>
-        <input type="radio" name="status" value="WIP">WIP<br>
-        <input type="radio" name="status" value="DONE">DONE<br>
-        <input type="radio" name="status" value="TODO">TODO
-        <br />
-        <input type="submit" value="Add post">
-    </form>
-</div>
-<div class="container" data-list-id="{{list_id}}">
-    <br>
-    <p>List by: {{author}} </p>
-    {% for post in posts %}
-    <div class="{{post.status}} activate" data-id="{{post.id}}">
-        <div class="post_content">
-
-            <p>{{post.body}}</p>
-            <p>{{post.post_time}}</p>
-            <p>{{post.comment}}</p>
-        </div>
-
-        <ul>
-            <li>Author: {{post.author}}</li>
-            <li class="delete">Delete</li>
-            <li class="toTODO">TODO</li>
-            <li class="toWIP">WIP</li>
-            <li class="toDONE">DONE</li>
-        </ul>
+        <p id="add_post">Add post</p>
+        <br>
+    {% if session["username"] == author %}
+        <a href="/{{list_id}}/add_permission">Add permission</a>
+    {% endif %}
+    <div id="post_area">
+        <!-- implement CSRF token here-->
+        <form action="/{{list_id}}/add_post" method="POST">
+            <label>Body</label>
+            <textarea name="body"></textarea>
+            <br/>
+            <label>Comment</label>
+            <input name="comment">
+            <br/>
+            <label>Status</label>
+            <input type="radio" name="status" value="WIP">WIP<br>
+            <input type="radio" name="status" value="DONE">DONE<br>
+            <input type="radio" name="status" value="TODO">TODO
+            <br />
+            <input type="submit" value="Add post">
+        </form>
     </div>
-    {% endfor %}
-</div>
+    <div class="container" data-list-id="{{list_id}}">
+        <br>
+        <p>List by: {{author}} </p>
+        {% for post in posts %}
+        <div class="{{post.status}} activate" data-id="{{post.id}}">
+            <div class="post_content">
+
+                <p>{{post.body}}</p>
+                <p>{{post.post_time}}</p>
+                <p>{{post.comment}}</p>
+            </div>
+
+            <ul>
+                <li>Author: {{post.author}}</li>
+                <li class="delete">Delete</li>
+                <li class="toTODO">TODO</li>
+                <li class="toWIP">WIP</li>
+                <li class="toDONE">DONE</li>
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+</body>
 
 {% endautoescape %}
 
