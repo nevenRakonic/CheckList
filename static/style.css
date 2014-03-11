@@ -32,10 +32,28 @@ a {
 }
 .top-left {
     position: absolute;
-    left: 0;
-    top: 0;
-    color: red;
+    left: 7px;
+    top: 3px;
+    color: white;
     cursor: pointer;
+}
+.top-bar {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 95%;
+    text-align: center;
+    color: white;
+}
+
+.WIP .top-bar {
+    background-color: orange;
+}
+.DONE .top-bar {
+    background-color: green;
+}
+.TODO .top-bar {
+    background-color: red;
 }
 /* Bootstrap overrides */
 
@@ -55,6 +73,13 @@ a {
     padding: 0px 4px;
     border-radius: 0;
 }
-.WIP {
+.editable {
+    word-wrap: break-word;
+}
 
+/* Custom media queries */
+@media screen and (max-width: 768px) {
+    .top-bar {
+        width: 100%;
+   }
 }

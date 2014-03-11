@@ -30,14 +30,14 @@
         <div class="row">
         {% for post in posts %}
         <div class="col-sm-3 {{post.status}} activate" data-id="{{post.id}}">
+            <div class="top-bar"><span>By: {{post.author}}</span></div>
             <div class="post_content">
-
                 <div class="editable">{{post.body}}</div>
                 <p>{{post.post_time}}</p>
             </div>
             <span class="glyphicon glyphicon-remove delete top-left"></span>
             <ul class="list-inline">
-                <li>By: {{post.author}}</li>
+                <li></li>
                 <li class="toTODO"><button type="button" class="btn btn-danger">TODO</button></li>
                 <li class="toWIP"><button type="button" class="btn btn-warning">WIP</button></li>
                 <li class="toDONE"><button type="button" class="btn btn-success">DONE</button></li>

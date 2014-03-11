@@ -6,8 +6,7 @@ from flaskext.bcrypt import Bcrypt
 #own modules
 from decorators import login_required, permissions_required
 
-#TODO define height in template
-
+#TODO define height in template for containers, fix buttons, end lists, add sorting/filtering via jquery
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config.update(
@@ -279,6 +278,7 @@ def change_status(list_id):
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    #TODO Limit registration to 20 characters
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
