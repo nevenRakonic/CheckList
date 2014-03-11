@@ -3,7 +3,7 @@ $(function() {
     //list id is the same for all posts and actions, so it can be global and loaded once
     var list_id = $(".container").data("list-id");
 
-    /* AJAX */    
+    /* AJAX */
     //ajax call to delete
     //div is the parent div that needs to be deleted
     function delete_post(target, id) {
@@ -35,7 +35,7 @@ $(function() {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function(data) {
-                $(target).prop("class", status);
+                $(target).prop("class", 'col-sm-3 ' + status +' activate');
             },
             failure: function(data) {
                 console.log("status change failed on id: " + id);
@@ -43,10 +43,10 @@ $(function() {
         });
     }
     /* EVENT HANDLERS */
-    //activates text editing on click, jeditable does the ajax call  
-    $(".activate").click(function() {        
+    //activates text editing on click, jeditable does the ajax call
+    $(".activate").click(function() {
         var id = $(this).closest("div").data("id");
-        var target = "div[data-id='" + id + "'] p:first-child";
+        var target = "div[data-id='" + id + "'] .editable";
         //$(target).css("background-color", "white");
         $(target).editable('/' + list_id + '/edit', {
             type: 'textarea',
@@ -54,14 +54,14 @@ $(function() {
             submit: 'Save',
             tooltip: 'click to edit',
             submitdata: {
-                post_id: id,                
+                post_id: id,
             },
             data: function(value, settings) {
                 var br2nl = value.replace(/<br[\s\/]?>/gi, '\n');
                 return br2nl;
             }
-        });        
-    });    
+        });
+    });
     //deletes entry
     $(".delete").click(function() {
         var id = $(this).closest("div").data("id");
@@ -89,6 +89,6 @@ $(function() {
             $(this).text("Add post");
             $("#post_area").hide();
             post_shown = false;
-        }        
+        }
     });
 });

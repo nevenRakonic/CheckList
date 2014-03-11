@@ -6,6 +6,8 @@ from flaskext.bcrypt import Bcrypt
 #own modules
 from decorators import login_required, permissions_required
 
+#TODO define height in template
+
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config.update(
@@ -152,7 +154,7 @@ def show_list(list_id):
     WHERE id = ?;
     """
     post_query = """
-    SELECT l.author as list_author, p.body, p.comment, p.status, p.id, p.post_time, p.author
+    SELECT l.author as list_author, p.body, p.status, p.id, p.post_time, p.author
     FROM lists l, posts p
     WHERE p.list_id = l.id
     AND l.id = ?
@@ -166,6 +168,7 @@ def show_list(list_id):
     else:
         #extracts list author, no need for another query
         author = posts[0]["list_author"]
+        #TODO add collapse to navbar
     return render_template('list_view.html', posts=posts, list_id=list_id, author=author)
 
 @app.route('/<int:list_id>/add_permission', methods=['GET', 'POST'])
@@ -178,27 +181,28 @@ def add_permission(list_id):
 
         if not db_username:
             flash("user doesn't exist")
-            return redirect('/' + str(list_id) + '/')
-
-        query = """
-        INSERT INTO permissions (user_id, list_id)
-        SELECT u.id, l.id
-        FROM users u, lists l
-        WHERE u.username = ?
-        AND l.id = ?;
-        """
-
-        #IntegrityError appears because user/list combo must be unique
-        try:
-            db = get_db()
-            db.execute(query, [username, list_id])
-            db.commit()
-        except sqlite3.IntegrityError:
-            flash("user already has permissions")
+        elif session["username"] == username:
+            flash("you already have permissions silly")
         else:
-            flash("permission added")
+            query = """
+            INSERT INTO permissions (user_id, list_id)
+            SELECT u.id, l.id
+            FROM users u, lists l
+            WHERE u.username = ?
+            AND l.id = ?;
+            """
 
-    return render_template('add_permission.html', list_id=list_id)
+            #IntegrityError appears because user/list combo must be unique
+            try:
+                db = get_db()
+                db.execute(query, [username, list_id])
+                db.commit()
+            except sqlite3.IntegrityError:
+                flash("user already has permissions")
+            else:
+                flash("permission added")
+
+    return redirect('/' + str(list_id) + '/')
 
 @app.route('/<int:list_id>/add_post', methods=['GET', 'POST'])
 @login_required
@@ -207,15 +211,15 @@ def add_post(list_id):
     if request.method == 'POST':
 
         body = request.form['body']
-        comment = request.form['comment']
+        body = "<br>".join(body.split("\n"))
         status = request.form['status']
         author = session["username"]
         post_time = get_current_time()
 
         db = get_db()
         db.execute(
-            'INSERT INTO posts (list_id, body, comment, status, post_time, author) VALUES (?, ?, ?, ?, ?, ?);',
-             [list_id, body, comment, status, post_time, author]
+            'INSERT INTO posts (list_id, body, status, post_time, author) VALUES (?, ?, ?, ?, ?);',
+             [list_id, body, status, post_time, author]
              )
         db.commit()
 
@@ -321,6 +325,7 @@ def login():
             session["permissions"] = get_permissions(session["id"], username)
 
             return redirect(url_for('home'))
+        #TODO add unsuccesfull login
 
     return render_template("login.html")
 
@@ -330,7 +335,6 @@ def logout():
     session.pop('username', None)
     session.pop('id', None)
     session.pop('permissions', None)
-    flash("Logged out...")
     return redirect(url_for('home'))
 
 if __name__ == '__main__':

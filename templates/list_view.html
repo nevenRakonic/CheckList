@@ -1,23 +1,20 @@
 {% extends "base.html" %}
 {% block body %}
 
-{% autoescape false %}
+
 <body>
+    {% include 'list_navbar.html' %}
     {% include 'flash.html' %}
+    <div class="container" data-list-id="{{list_id}}">
 
         <p id="add_post">Add post</p>
         <br>
-    {% if session["username"] == author %}
-        <a href="/{{list_id}}/add_permission">Add permission</a>
-    {% endif %}
+    {% autoescape false %}
     <div id="post_area">
         <!-- implement CSRF token here-->
         <form action="/{{list_id}}/add_post" method="POST">
             <label>Body</label>
             <textarea name="body"></textarea>
-            <br/>
-            <label>Comment</label>
-            <input name="comment">
             <br/>
             <label>Status</label>
             <input type="radio" name="status" value="WIP">WIP<br>
@@ -27,30 +24,31 @@
             <input type="submit" value="Add post">
         </form>
     </div>
-    <div class="container" data-list-id="{{list_id}}">
+
         <br>
         <p>List by: {{author}} </p>
+        <div class="row">
         {% for post in posts %}
-        <div class="{{post.status}} activate" data-id="{{post.id}}">
+        <div class="col-sm-3 {{post.status}} activate" data-id="{{post.id}}">
             <div class="post_content">
 
-                <p>{{post.body}}</p>
+                <div class="editable">{{post.body}}</div>
                 <p>{{post.post_time}}</p>
-                <p>{{post.comment}}</p>
             </div>
-
-            <ul>
-                <li>Author: {{post.author}}</li>
-                <li class="delete">Delete</li>
-                <li class="toTODO">TODO</li>
-                <li class="toWIP">WIP</li>
-                <li class="toDONE">DONE</li>
+            <span class="glyphicon glyphicon-remove delete top-left"></span>
+            <ul class="list-inline">
+                <li>By: {{post.author}}</li>
+                <li class="toTODO"><button type="button" class="btn btn-danger">TODO</button></li>
+                <li class="toWIP"><button type="button" class="btn btn-warning">WIP</button></li>
+                <li class="toDONE"><button type="button" class="btn btn-success">DONE</button></li>
             </ul>
-        </div>
+        </div><!--column-->
         {% endfor %}
-    </div>
+        </div><!--.row-->
+        {% endautoescape %}
+    </div><!--.container-->
 </body>
 
-{% endautoescape %}
+
 
 {% endblock %}
