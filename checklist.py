@@ -168,6 +168,7 @@ def show_list(list_id):
         #extracts list author, no need for another query
         author = posts[0]["list_author"]
         #TODO add collapse to navbar
+    print len(posts)
     return render_template('list_view.html', posts=posts, list_id=list_id, author=author)
 
 @app.route('/<int:list_id>/add_permission', methods=['GET', 'POST'])

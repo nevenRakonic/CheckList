@@ -67,7 +67,7 @@ a {
     border-bottom: 1px solid #FFF;
 }
 .activate {
-    padding: 20px;
+    padding: 30px 15px 20px 5px;
 }
 .WIP .btn, .TODO .btn, .DONE .btn {
     padding: 0px 4px;
@@ -75,7 +75,9 @@ a {
 }
 .editable {
     word-wrap: break-word;
+    min-height: 85px;
 }
+
 
 /* Custom media queries */
 @media screen and (max-width: 768px) {

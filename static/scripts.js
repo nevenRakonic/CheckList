@@ -53,6 +53,7 @@ $(function() {
             cancel: 'Cancel',
             submit: 'Save',
             tooltip: 'click to edit',
+            rows: 4,
             submitdata: {
                 post_id: id,
             },
