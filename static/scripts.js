@@ -2,7 +2,6 @@ $(function() {
     /* GLOBALS */
     //list id is the same for all posts and actions, so it can be global and loaded once
     var list_id = $(".container").data("list-id");
-
     /* AJAX */
     //ajax call to delete
     //div is the parent div that needs to be deleted
@@ -35,7 +34,7 @@ $(function() {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function(data) {
-                $(target).prop("class", 'col-sm-3 ' + status +' activate');
+                $(target).prop("class", 'col-sm-3 ' + status + ' activate');
             },
             failure: function(data) {
                 console.log("status change failed on id: " + id);
@@ -84,12 +83,30 @@ $(function() {
     $("#add_post").click(function() {
         if (!post_shown) {
             $(this).text("Hide add post");
-            $("#post_area").show();
+            $("#post_area").show("slow");
             post_shown = true;
         } else {
             $(this).text("Add post");
-            $("#post_area").hide();
+            $("#post_area").hide("slow");
             post_shown = false;
         }
     });
+    //sorting dropdown
+    $("select").change(function() {
+        $("select option:selected").each(function (){
+            if( $(this).text() == "Sort by Date"){
+                $(".activate").tsort({data: 'id'});
+            }
+            if( $(this).text() == "Sort by Author"){
+                $(".activate").tsort({data: 'author'});
+            }
+
+        });
+    });
 });
+/* sorting snipets
+ author:
+$(".activate").tsort({data: 'author'})
+ date: newer stuff has newer id
+ $(".activate").tsort({data: 'id'})
+ add stuff for priority when that will be added*/

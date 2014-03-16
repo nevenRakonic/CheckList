@@ -4,25 +4,55 @@
 
 <body>
     {% include 'list_navbar.html' %}
-    {% include 'flash.html' %}
     <div class="container" data-list-id="{{list_id}}">
+        {% include 'flash.html' %}
 
         <p id="add_post">Add post</p>
         <br>
     {% autoescape false %}
-    <div id="post_area">
+    <div class="row">
+    <div class="col-sm-8 col-sm-offset-2" id="post_area">
         <!-- implement CSRF token here-->
-        <form action="/{{list_id}}/add_post" method="POST">
-            <label>Body</label>
-            <textarea name="body"></textarea>
-            <br/>
+        <form class="form-horizontal" role="form" action="/{{list_id}}/add_post" method="POST">
+            <div class="form-group">
+                <label for="body" class="control-label">Post content:</label>
+                <textarea class="form-control" rows="4" name="body"></textarea>
+            </div>
             <label>Status</label>
-            <input type="radio" name="status" value="WIP">WIP<br>
-            <input type="radio" name="status" value="DONE">DONE<br>
-            <input type="radio" name="status" value="TODO">TODO
-            <br />
-            <input type="submit" value="Add post">
+
+            <div class="form-group">
+                <div class="col-sm-12">
+                <div class="radio">
+                    <label for="WIP">
+                        <input type="radio" name="status" value="WIP">WIP
+                    </label>
+                </div>
+                <div class="radio">
+                    <label for="DONE">
+                        <input type="radio" name="status" value="DONE">DONE
+                    </label>
+                </div>
+                <div class="radio">
+                    <label for="TODO">
+                        <input type="radio" name="status" value="TODO">TODO
+                    </label>
+                </div>
+            </div><!--column-->
+            </div><!--.form-group-->
+
+            <div class="form-group">
+                 <div class="col-sm-12">
+                <button type="submit" class="btn btn-default">Add post</button>
+                </div>
+            </div>
         </form>
+    </div>
+    <div class="form-group">
+                <select class="form-control sorting">
+                  <option>Sort by Date</option>
+                  <option>Sort by Author</option>
+                </select>
+            </div>
     </div>
 
         <br>
@@ -30,7 +60,7 @@
         {% for row in posts|batch(4) %}
         <div class="row">
             {% for post in row %}
-                <div class="col-sm-3 {{post.status}} activate" data-id="{{post.id}}">
+                <div class="col-sm-3 {{post.status}} activate" data-id="{{post.id}}" data-author="{{post.author}}">
                     <div class="top-bar"><span>By: {{post.author}}</span></div>
                     <div class="post_content">
                         <div class="editable">{{post.body}}</div>

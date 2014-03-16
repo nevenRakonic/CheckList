@@ -279,7 +279,6 @@ def change_status(list_id):
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    #TODO Limit registration to 20 characters
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -290,6 +289,9 @@ def register():
             return render_template("register.html")
         if not password == duplicate_pass:
             flash("passwords didn't match")
+            return render_template("register.html")
+        if len(username) > 30:
+            flash("username can't have more than 30 characters")
             return render_template("register.html")
 
         password = bcrypt.generate_password_hash(request.form['password'])
@@ -326,7 +328,7 @@ def login():
             session["permissions"] = get_permissions(session["id"], username)
 
             return redirect(url_for('home'))
-        #TODO add unsuccesfull login
+        flash("Login unsuccesful!")
 
     return render_template("login.html")
 
