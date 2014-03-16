@@ -1,12 +1,13 @@
 body {
     font-family: 'Lato', sans-serif;
+    color: #6B695F;
 }
 a {
     color: #D65A23;
 }
 .home {
-    background-color: #2E7C73;
-    color: white;
+    background-color: #EBE8DF;
+
 }
 .col-centered {
     float: none;
@@ -16,8 +17,14 @@ a {
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
     border-radius: 8px;
-    border: 2px solid #fff;
+    border: 2px solid #B8B3A3;
     padding: 10px;
+}
+.start > h3 {
+    margin-top: 0px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #B8B3A3;
 }
 .landing {
     margin: 3% 0 3% 0;
@@ -45,7 +52,6 @@ a {
     text-align: center;
     color: white;
 }
-
 .WIP .top-bar {
     background-color: orange;
 }
@@ -57,15 +63,12 @@ a {
 }
 /* Bootstrap overrides */
 
-.help-block {
-    color: #FFF;
+/* start screen */
+
+.navbar {
+    border-radius: 0;
 }
-.start > h3 {
-    margin-top: 0px;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #FFF;
-}
+
 .activate {
     padding: 30px 15px 20px 5px;
 }
@@ -77,9 +80,8 @@ a {
     word-wrap: break-word;
     min-height: 85px;
 }
-
-
 /* Custom media queries */
+
 @media screen and (max-width: 768px) {
     .top-bar {
         width: 100%;

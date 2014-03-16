@@ -92,15 +92,14 @@ $(function() {
         }
     });
     //sorting dropdown
-    $("select").change(function() {
-        $("select option:selected").each(function (){
+    $("#list-select").change(function() {
+        $("#list-select option:selected").each(function (){
             if( $(this).text() == "Sort by Date"){
-                $(".activate").tsort({data: 'id'});
+                $(".activate").tsort({order: 'desc', data: 'id'});
             }
             if( $(this).text() == "Sort by Author"){
                 $(".activate").tsort({data: 'author'});
             }
-
         });
     });
 });

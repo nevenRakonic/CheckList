@@ -7,16 +7,64 @@
 
         {% include 'flash.html' %}
         <h1>My lists</h1>
-        {% for list in own_lists %}
-            <a href="{{list.id}}/">{{list.name}}</a>
-            <br>
-        {% endfor %}
+        <div class="table-responsive">
+            <table class="table sortable">
+                {% for list in own_lists %}
+                {% if loop.index == 1 %}
+                <thead>
+                <tr>
+                    <th>List name</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% endif %}
+                <tr>
+                    <td>
+                        <a href="{{list.id}}/">{{list.name}}</a>
+                    </td>
+                    <td>
+                        <p>{{list.created}}</p>
+                    </td>
+                </tr>
+                {% if loop.index == own_lists|length %}
+                </tbody>
+                {% endif %}
+                {% endfor %}
+            </table>
+        </div><!--responsive div-->
 
         <h1>Others lists</h1>
-        {% for list in others_lists %}
-            <a href="{{list.id}}/">{{list.name}}</a>
-            <br>
-        {% endfor %}
+        <div class="table-responsive">
+            <table class="table sortable">
+            {% for list in others_lists %}
+            {% if loop.index == 1 %}
+            <thead>
+            <tr>
+                <th>List name</th>
+                <th>Author</th>
+                <th>Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% endif %}
+            <tr>
+                <td>
+                <a href="{{list.id}}/">{{list.name}}</a>
+                </td>
+                <td>
+                <p>{{list.author}}</p>
+                </td>
+                <td>
+                <p>{{list.created}}</p>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if loop.index == other_lists|length %}
+                </tbody>
+            {% endif %}
+            </table>
+        </div><!--responsive div-->
     </div>
 </body>
 

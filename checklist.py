@@ -6,7 +6,6 @@ from flaskext.bcrypt import Bcrypt
 #own modules
 from decorators import login_required, permissions_required
 
-#TODO define height in template for containers, fix buttons, end lists, add sorting/filtering via jquery
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config.update(
@@ -106,7 +105,7 @@ def home():
     own_lists = query_db(own_query, [username])
 
     others_query = """
-    SELECT l.name, l.id, l.author
+    SELECT l.name, l.id, l.author, l.created
     FROM lists l, permissions p, users u
     WHERE  u.id = p.user_id
     AND l.id = p.list_id
@@ -124,11 +123,12 @@ def add_list():
         name = request.form['list_name']
         author = session['username']
         author_id = session['id']
+        created = get_current_time()
 
         db = get_db()
         db.execute(
-            'INSERT INTO lists (name, author_id, author) VALUES (?, ?, ?);',
-             [name, author_id, author]
+            'INSERT INTO lists (name, created, author_id, author) VALUES (?, ?, ?, ?);',
+             [name, created, author_id, author]
              )
         db.commit()
         session["permissions"] = get_permissions(session["id"], session["username"])
@@ -153,7 +153,7 @@ def show_list(list_id):
     WHERE id = ?;
     """
     post_query = """
-    SELECT l.author as list_author, p.body, p.status, p.id, p.post_time, p.author
+    SELECT l.author as list_author, l.created, p.body, p.status, p.id, p.post_time, p.author
     FROM lists l, posts p
     WHERE p.list_id = l.id
     AND l.id = ?
@@ -287,6 +287,9 @@ def register():
         if find_username(username):
             flash("username already exists!")
             return render_template("register.html")
+        if len(password) < 4:
+            flash("password must contain at least 4 characters!")
+            return render_template("register.html")
         if not password == duplicate_pass:
             flash("passwords didn't match")
             return render_template("register.html")
@@ -303,6 +306,7 @@ def register():
              [username, password, join_date]
              )
         db.commit()
+        flash("You can login with your account now")
         return redirect(url_for('home'))
 
     return render_template("register.html")
@@ -320,7 +324,7 @@ def login():
             )
 
         if user:
-            user = dict(user)   #dict is needed to convert the sqlite.frow object to a dictionary
+            user = dict(user)   #dict is needed to convert the sqlite.row object to a dictionary
             logged_in = check_login(username, password, user)
         if logged_in:
             session["username"] = username
