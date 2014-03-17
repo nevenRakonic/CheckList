@@ -1,14 +1,14 @@
 $(function() {
     /* GLOBALS */
     //list id is the same for all posts and actions, so it can be global and loaded once
-    var list_id = $(".container").data("list-id");
+    var GLOBAL_LIST_ID = $(".container").data("list-id");
     /* AJAX */
-    //ajax call to delete
+    //ajax call to delete_post
     //div is the parent div that needs to be deleted
     function delete_post(target, id) {
         $.ajax({
             type: "POST",
-            url: "/" + list_id + "/delete",
+            url: "/" + GLOBAL_LIST_ID + "/delete_post",
             data: JSON.stringify({
                 id: id
             }),
@@ -22,11 +22,12 @@ $(function() {
             }
         });
     }
+
     //ajax call to status
     function change_status(status, target, id) {
         $.ajax({
             type: "POST",
-            url: "/" + list_id + "/status",
+            url: "/" + GLOBAL_LIST_ID + "/status",
             data: JSON.stringify({
                 status: status,
                 id: id
@@ -47,7 +48,7 @@ $(function() {
         var id = $(this).closest("div").data("id");
         var target = "div[data-id='" + id + "'] .editable";
         //$(target).css("background-color", "white");
-        $(target).editable('/' + list_id + '/edit', {
+        $(target).editable('/' + GLOBAL_LIST_ID + '/edit', {
             type: 'textarea',
             cancel: 'Cancel',
             submit: 'Save',
@@ -62,7 +63,7 @@ $(function() {
             }
         });
     });
-    //deletes entry
+    //deletes post entry
     $(".delete").click(function() {
         var id = $(this).closest("div").data("id");
         var target = "div[data-id='" + id + "']";

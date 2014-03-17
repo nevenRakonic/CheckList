@@ -26,6 +26,9 @@
                     <td>
                         <p>{{list.created}}</p>
                     </td>
+                    <td>
+                        <a class="delete_list" href="/{{list.id}}/delete_list">Delete</a>
+                    </td>
                 </tr>
                 {% if loop.index == own_lists|length %}
                 </tbody>

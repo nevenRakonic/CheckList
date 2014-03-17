@@ -14,10 +14,6 @@ a {
     margin: 0 auto;
 }
 .start {
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    border-radius: 8px;
-    border: 2px solid #B8B3A3;
     padding: 10px;
 }
 .start > h3 {

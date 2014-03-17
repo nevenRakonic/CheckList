@@ -13,6 +13,8 @@ app.config.update(
     SECRET_KEY='oIOXe0CQufWKBR1B',
     DATABASE='db/test_db.db'
                 )
+#TODO DELETE LIST
+#TODO SHOW COMPLETED %
 
 #DATABSE HELPER METHODS
 def connect_db():
@@ -28,7 +30,7 @@ def get_db():
         db = g._database = connect_db()
     return db
 
-def query_db(query, args=(), one=False, modify=False):
+def query_db(query, args=(), one=False, script=False):
     """Queries database, one is for one result only.
     """
     cur = get_db().execute(query, args)
@@ -250,11 +252,23 @@ def edit(list_id):
 
     return body
 
-#ajax uses this delete function
-@app.route('/<int:list_id>/delete', methods=['POST'])
+@app.route('/<int:list_id>/delete_list', methods=['GET'])
 @login_required
 @permissions_required
-def delete(list_id):
+def delete_list(list_id):
+    #table names can't be parameterized, use until cascade gets set up properly in the database
+    modify_db('DELETE FROM lists WHERE id = ?;', [ list_id])
+    modify_db('DELETE FROM posts WHERE list_id = ?;', [list_id])
+    modify_db('DELETE FROM permissions WHERE list_id = ?;', [list_id])
+
+    flash("list deleted!")
+    return redirect(url_for('home'))
+
+#ajax uses this delete function
+@app.route('/<int:list_id>/delete_post', methods=['POST'])
+@login_required
+@permissions_required
+def delete_post(list_id):
     if list_id in session["permissions"]:
         data = request.get_json()
         data_id = data["id"]
