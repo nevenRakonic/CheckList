@@ -61,6 +61,11 @@ a {
 .TODO .top-bar {
     background-color: red;
 }
+
+#posts-header {
+    padding-bottom: 10px;
+    border-bottom: 2px solid #EBE8DF;
+}
 /* Bootstrap overrides */
 
 /* navigation */
@@ -72,6 +77,11 @@ a {
 .navbar-default {
     background-color: #EBE8DF;
     border-color: #e7e7e7;
+}
+
+/* MIGHT NOT NEED THIS*/
+#list-select {
+    margin-top: 8px;
 }
 
 .activate {

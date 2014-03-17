@@ -121,26 +121,24 @@ def home():
     others_lists = query_db(others_query, [username])
     return render_template('home.html', own_lists=own_lists, others_lists=others_lists)
 
-@app.route('/add_list', methods=['GET', 'POST'])
+@app.route('/add_list', methods=['POST'])
 @login_required
 def add_list():
     """This view creates a new task list"""
-    if request.method == 'POST':
-        name = request.form['list_name']
-        author = session['username']
-        author_id = session['id']
-        created = get_current_time()
+    name = request.form['list_name']
+    author = session['username']
+    author_id = session['id']
+    created = get_current_time()
 
-        modify_db(
-            'INSERT INTO lists (name, created, author_id, author) VALUES (?, ?, ?, ?);',
-            [name, created, author_id, author]
-            )
+    modify_db(
+        'INSERT INTO lists (name, created, author_id, author) VALUES (?, ?, ?, ?);',
+        [name, created, author_id, author]
+        )
 
-        session["permissions"] = get_permissions(session["id"], session["username"])
-        flash(str(name) + " list added")
-        return redirect(url_for('home'))
-    #TODO Change template routing and check if list with same name exists
-    return render_template('add_list.html')
+
+    session["permissions"] = get_permissions(session["id"], session["username"])
+    flash(str(name) + " list added")
+    return redirect(url_for('home'))
 
 
 @app.route('/<int:list_id>/')
@@ -149,16 +147,16 @@ def add_list():
 def show_list(list_id):
     """Shows all the posts in the list.
     Integer list_id is passed on from url
-    identify the list in the databse
+    to identify the list in the databse
     """
 
     author_query = """
-    SELECT author
+    SELECT author, name
     FROM lists
     WHERE id = ?;
     """
     post_query = """
-    SELECT l.author as list_author, l.created, p.body, p.status, p.id, p.post_time, p.author
+    SELECT l.author as list_author, l.name, l.created, p.body, p.status, p.id, p.post_time, p.author
     FROM lists l, posts p
     WHERE p.list_id = l.id
     AND l.id = ?
@@ -167,14 +165,23 @@ def show_list(list_id):
     posts = query_db(post_query, [list_id])
 
     if not posts:
+        #this case only happens if there are no posts in the list yet
         #first index must be the author because it's the only query result
-        author = query_db(author_query, [list_id], one=True)[0]
+        list_data = query_db(author_query, [list_id], one=True)
+        author = list_data[0]
+        list_name = list_data[1]
     else:
         #extracts list author, no need for another query
         author = posts[0]["list_author"]
+        list_name = posts[0]["name"]
         #TODO add collapse to navbar
-    print len(posts)
-    return render_template('list_view.html', posts=posts, list_id=list_id, author=author)
+
+    return render_template(
+        'list_view.html',
+        posts=posts,
+        list_id=list_id,
+        author=author,
+        list_name=list_name)
 
 @app.route('/<int:list_id>/add_permission', methods=['GET', 'POST'])
 @login_required
@@ -219,12 +226,11 @@ def add_post(list_id):
         author = session["username"]
         post_time = get_current_time()
 
-        db = get_db()
-        db.execute(
+        modify_db(
             'INSERT INTO posts (list_id, body, status, post_time, author) VALUES (?, ?, ?, ?, ?);',
              [list_id, body, status, post_time, author]
              )
-        db.commit()
+        #TODO lack of status
 
         flash("post added")
         return redirect("/{0}/".format(list_id))
@@ -293,7 +299,7 @@ def register():
         password = bcrypt.generate_password_hash(request.form['password'])
         join_date = get_current_time()
 
-        modify_db.(
+        modify_db(
             'INSERT INTO users (username, password, join_date) VALUES (?, ?, ?);',
              [username, password, join_date]
              )

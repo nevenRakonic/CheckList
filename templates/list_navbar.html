@@ -1,22 +1,40 @@
 <!-- DOESN'T NEED TO EXTEND TEMPLATE BECAUSE IT WILL USE THE CONTEXT OF WHERE IT'S INCLUDED-->
 <nav class="navbar navbar-default" role="navigation">
   <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
       <a class="navbar-brand" href="{{url_for('home')}}">Welcome, {{session["username"]}}</a>
     </div>
-    {% if session["username"] == author %}
-    <div class="navbar-left">
+
+    <div class="collapse navbar-collapse" id="navbar-collapse">
       <form class="navbar-form navbar-left" role="search" action="/{{list_id}}/add_permission" method="POST">
+        {% if session["username"] == author %}
         <div class="form-group">
           <input name="username" type="text" class="form-control" placeholder="Share with...">
         </div>
         <button type="submit" class="btn btn-default">Add permission</button>
+        {% endif %}
+        <button type="button" class="btn btn-default" id="add_post">Add post</button>
       </form>
-    </div><!-- form -->
-    {% endif %}
     <ul class="nav navbar-nav navbar-right">
-        <li><a href="/logout">Logout</a></li>
+      <li><select id="list-select" class="form-control" id="list-view-sort">
+              <option>Sort by Date (desc)</option>
+              <option>Sort by Date (asc)</option>
+              <option>Sort by Author</option>
+          </select>
+      </li>
+
+      <li><a href="/logout">Logout</a></li>
     </ul>
+    </div><!-- colapsible -->
+
+
+
+
   </div><!-- /.container-fluid -->
 </nav>

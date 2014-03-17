@@ -3,20 +3,28 @@
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
       <a class="navbar-brand" href="{{url_for('home')}}">Welcome, {{session["username"]}}</a>
 
     </div>
 
-    <div class="navbar-left">
+    <div class="collapse navbar-collapse" id="navbar-collapse">
       <form class="navbar-form navbar-left" role="search" action="/add_list" method="POST">
         <div class="form-group">
           <input name="list_name" type="text" class="form-control" placeholder="Add a new task list">
         </div>
         <button type="submit" class="btn btn-default">Add list</button>
       </form>
-    </div><!-- /.navbar-left -->
-    <ul class="nav navbar-nav navbar-right">
+      <ul class="nav navbar-nav navbar-right">
         <li><a href="/logout">Logout</a></li>
     </ul>
+    </div><!-- collapse -->
+
+
   </div><!-- /.container-fluid -->
 </nav>

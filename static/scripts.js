@@ -94,8 +94,11 @@ $(function() {
     //sorting dropdown
     $("#list-select").change(function() {
         $("#list-select option:selected").each(function (){
-            if( $(this).text() == "Sort by Date"){
+            if( $(this).text() == "Sort by Date (desc)"){
                 $(".activate").tsort({order: 'desc', data: 'id'});
+            }
+            if( $(this).text() == "Sort by Date (asc)"){
+                $(".activate").tsort({order: 'asc', data: 'id'});
             }
             if( $(this).text() == "Sort by Author"){
                 $(".activate").tsort({data: 'author'});
@@ -103,9 +106,4 @@ $(function() {
         });
     });
 });
-/* sorting snipets
- author:
-$(".activate").tsort({data: 'author'})
- date: newer stuff has newer id
- $(".activate").tsort({data: 'id'})
- add stuff for priority when that will be added*/
+
