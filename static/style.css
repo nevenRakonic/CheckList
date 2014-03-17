@@ -63,10 +63,15 @@ a {
 }
 /* Bootstrap overrides */
 
-/* start screen */
+/* navigation */
 
 .navbar {
     border-radius: 0;
+}
+
+.navbar-default {
+    background-color: #EBE8DF;
+    border-color: #e7e7e7;
 }
 
 .activate {

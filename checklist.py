@@ -28,12 +28,18 @@ def get_db():
         db = g._database = connect_db()
     return db
 
-def query_db(query, args=(), one=False):
-    """Queries database"""
+def query_db(query, args=(), one=False, modify=False):
+    """Queries database, one is for one result only.
+    """
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
+
+def modify_db(query, args=()):
+    db = get_db()
+    db.execute(query, args)
+    db.commit()
 
 def find_username(username):
     """Checks if username exists and returns username"""
@@ -125,12 +131,11 @@ def add_list():
         author_id = session['id']
         created = get_current_time()
 
-        db = get_db()
-        db.execute(
+        modify_db(
             'INSERT INTO lists (name, created, author_id, author) VALUES (?, ?, ?, ?);',
-             [name, created, author_id, author]
-             )
-        db.commit()
+            [name, created, author_id, author]
+            )
+
         session["permissions"] = get_permissions(session["id"], session["username"])
         flash(str(name) + " list added")
         return redirect(url_for('home'))
@@ -194,9 +199,7 @@ def add_permission(list_id):
 
             #IntegrityError appears because user/list combo must be unique
             try:
-                db = get_db()
-                db.execute(query, [username, list_id])
-                db.commit()
+                modify_db(query, [username, list_id])
             except sqlite3.IntegrityError:
                 flash("user already has permissions")
             else:
@@ -237,10 +240,7 @@ def edit(list_id):
     post_id = request.form['post_id']
     body = "<br>".join(body.split("\n"))
 
-
-    db = get_db()
-    db.execute('UPDATE posts SET body=? WHERE ID=?', [body, post_id])
-    db.commit()
+    modify_db('UPDATE posts SET body=? WHERE ID=?', [body, post_id])
 
     return body
 
@@ -252,10 +252,7 @@ def delete(list_id):
     if list_id in session["permissions"]:
         data = request.get_json()
         data_id = data["id"]
-
-        db = get_db()
-        db.execute('DELETE FROM posts WHERE ID=?', [data_id])
-        db.commit()
+        modify_db('DELETE FROM posts WHERE ID=?', [data_id])
 
         return jsonify(result=None) #needs to return something, so it only returns empty data
 
@@ -269,12 +266,8 @@ def change_status(list_id):
 
         data_id = data["id"]
         status = data["status"]
+        modify_db('UPDATE posts SET status=? WHERE ID=?', [status, data_id])
 
-        db = get_db()
-        db.execute('UPDATE posts SET status=? WHERE ID=?', [status, data_id])
-        db.commit()
-
-        return jsonify(result=None)
     return jsonify(result=None)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -300,12 +293,11 @@ def register():
         password = bcrypt.generate_password_hash(request.form['password'])
         join_date = get_current_time()
 
-        db = get_db()
-        db.execute(
+        modify_db.(
             'INSERT INTO users (username, password, join_date) VALUES (?, ?, ?);',
              [username, password, join_date]
              )
-        db.commit()
+
         flash("You can login with your account now")
         return redirect(url_for('home'))
 
