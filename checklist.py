@@ -5,7 +5,6 @@ from flask import g, redirect, jsonify, session, flash
 from flaskext.bcrypt import Bcrypt
 #own modules
 from decorators import *
-from db import *
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
