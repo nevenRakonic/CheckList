@@ -8,7 +8,7 @@ from flaskext.bcrypt import Bcrypt
 from decorators import *
 
 dir = os.path.dirname(__file__)
-database_location = os.path.join(dir, '/db/production.db')
+database_location = os.path.join(dir, 'db/production.db')
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
