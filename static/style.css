@@ -5,9 +5,10 @@ body {
 a {
     color: #D65A23;
 }
+/*landing page */
+
 .home {
     background-color: #EBE8DF;
-
 }
 .col-centered {
     float: none;
@@ -33,6 +34,8 @@ a {
     font-size: 24px;
     margin: 0;
 }
+/* list view */
+
 .top-left {
     position: absolute;
     left: 7px;
@@ -69,17 +72,20 @@ a {
 .navbar {
     border-radius: 0;
 }
-
 .navbar-default {
     background-color: #EBE8DF;
     border-color: #e7e7e7;
 }
 
-/* MIGHT NOT NEED THIS*/
 #list-select {
     margin-top: 8px;
 }
 
+/* home view */
+
+.table>tbody>tr>td{
+    border-top: 2px solid #ddd;
+}
 .activate {
     padding: 30px 15px 20px 5px;
 }

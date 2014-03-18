@@ -1,10 +1,18 @@
 $(function() {
+
     /* GLOBALS */
     //list id is the same for all posts and actions, so it can be global and loaded once
     var GLOBAL_LIST_ID = $(".container").data("list-id");
+    /* HELPER FUNCTIONS */
+    function notify(text){
+        var dialog = confirm(text);
+        if (dialog)
+            return true;
+        else
+            return false;
+    }
     /* AJAX */
     //ajax call to delete_post
-    //div is the parent div that needs to be deleted
     function delete_post(target, id) {
         $.ajax({
             type: "POST",
@@ -22,7 +30,6 @@ $(function() {
             }
         });
     }
-
     //ajax call to status
     function change_status(status, target, id) {
         $.ajax({
@@ -67,8 +74,14 @@ $(function() {
     $(".delete").click(function() {
         var id = $(this).closest("div").data("id");
         var target = "div[data-id='" + id + "']";
-        delete_post(target, id);
+        if (notify("Are you sure you want to delete this post?"))
+            delete_post(target, id);
     });
+    //deletes list. done on the backend js just for the dialog
+    $(".delete_list").click(function() {
+        return notify("Are you sure you want to delete this list?");
+    });
+
     //changes post status
     $(".toTODO, .toWIP, .toDONE").click(function() {
         var id = $(this).closest("div").data("id");
@@ -106,5 +119,7 @@ $(function() {
             }
         });
     });
+
+
 });
 
