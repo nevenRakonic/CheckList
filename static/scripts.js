@@ -54,13 +54,14 @@ $(function() {
     $(".activate").click(function() {
         var id = $(this).closest("div").data("id");
         var target = "div[data-id='" + id + "'] .editable";
-        //$(target).css("background-color", "white");
+        $('textarea').attr('maxlength', 160)
+
         $(target).editable('/' + GLOBAL_LIST_ID + '/edit', {
             type: 'textarea',
             cancel: 'Cancel',
             submit: 'Save',
             tooltip: 'click to edit',
-            rows: 4,
+            rows: 3,
             submitdata: {
                 post_id: id,
             },
@@ -114,12 +115,14 @@ $(function() {
             if( $(this).text() == "Sort by Date (asc)"){
                 $(".activate").tsort({order: 'asc', data: 'id'});
             }
-            if( $(this).text() == "Sort by Author"){
-                $(".activate").tsort({data: 'author'});
+            if( $(this).text() == "Sort by Author (desc)"){
+                $(".activate").tsort({order: 'desc', data: 'author'});
+            }
+            if( $(this).text() == "Sort by Author (asc)"){
+                $(".activate").tsort({order: 'asc', data: 'author'});
             }
         });
     });
-
 
 });
 

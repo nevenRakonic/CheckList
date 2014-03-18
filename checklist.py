@@ -10,9 +10,9 @@ from db import *
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config.update(
-    DEBUG=True,
+    DEBUG=False,
     SECRET_KEY='oIOXe0CQufWKBR1B',
-    DATABASE='db/test_db.db'
+    DATABASE='db/production.db'
                 )
 #TODO SHOW COMPLETED %
 
@@ -83,7 +83,7 @@ def add_list():
     flash(str(name) + " list added")
     return redirect(url_for('home'))
 
-
+#TODOD refactor the way posts are shown
 @app.route('/<int:list_id>/')
 @login_required
 @permissions_required
@@ -129,6 +129,9 @@ def show_list(list_id):
 @login_required
 @permissions_required
 def add_permission(list_id):
+    """Adds a permissions to see and manipulate a list
+    that was not made by the user
+    """
     if request.method == 'POST':
         username = request.form['username']
         db_username = find_username(username)
@@ -160,11 +163,14 @@ def add_permission(list_id):
 @login_required
 @permissions_required
 def add_post(list_id):
+    """Add's a post to the list
+    """
     if request.method == 'POST':
 
         body = request.form['body']
         body = "<br>".join(body.split("\n"))
         status = request.form['status']
+
         author = session["username"]
         post_time = get_current_time()
 
@@ -184,6 +190,10 @@ def add_post(list_id):
 @login_required
 @permissions_required
 def edit(list_id):
+    """This function is used by jeditable
+    jquery plugin to edit a post
+    Jeditable turns a div into a textarea form
+    """
     body = request.form['value']
     post_id = request.form['post_id']
     #turn newlines into html break lines
@@ -197,6 +207,9 @@ def edit(list_id):
 @login_required
 @permissions_required
 def delete_list(list_id):
+    """Deletes the list and all the
+    places it appears in the db
+    """
     #table names can't be parameterized, use until cascade gets set up properly in the database
     modify_db('DELETE FROM lists WHERE id = ?;', [ list_id])
     modify_db('DELETE FROM posts WHERE list_id = ?;', [list_id])
@@ -205,11 +218,11 @@ def delete_list(list_id):
     flash("list deleted!")
     return redirect(url_for('home'))
 
-#ajax uses this delete function
 @app.route('/<int:list_id>/delete_post', methods=['POST'])
 @login_required
 @permissions_required
 def delete_post(list_id):
+    """Deletes a post from the list via ajax"""
     if list_id in session["permissions"]:
         data = request.get_json()
         data_id = data["id"]
@@ -217,11 +230,11 @@ def delete_post(list_id):
 
         return jsonify(result=None) #needs to return something, so it only returns empty data
 
-#ajax uses this function to change status
 @app.route('/<int:list_id>/status', methods=['POST'])
 @login_required
 @permissions_required
 def change_status(list_id):
+    """Changes post status via ajax"""
     if list_id in session["permissions"]:
         data = request.get_json()
 
@@ -233,11 +246,17 @@ def change_status(list_id):
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """This views shows the registration form.
+    POST method adds the user to db if all the
+    conditions are satisfied
+    """
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         duplicate_pass = request.form['duplicate_pass']
 
+
+        #TODO refactor this
         if find_username(username):
             flash("username already exists!")
             return render_template("register.html")
@@ -266,6 +285,7 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Logs in user, saves data to session"""
     if request.method == 'POST':
         logged_in = False
 
@@ -292,6 +312,7 @@ def login():
 @app.route('/logout')
 @login_required
 def logout():
+    """Logs the user out"""
     session.pop('username', None)
     session.pop('id', None)
     session.pop('permissions', None)

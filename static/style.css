@@ -61,6 +61,10 @@ a {
     background-color: red;
 }
 
+.editable {
+    height: 100px;
+    overflow: auto;
+}
 #posts-header {
     padding-bottom: 10px;
     border-bottom: 2px solid #EBE8DF;
