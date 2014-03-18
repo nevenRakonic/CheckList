@@ -1,6 +1,6 @@
 import sqlite3
 from flask import g
-from checklist import app
+from checklist.checklist import app
 
 #THIS FILE CONTAINS FUNCTIONS THAT HELP WITH DATABASE INTERACTION
 
