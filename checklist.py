@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from datetime import datetime
 from flask import Flask, render_template, request, url_for
@@ -6,12 +7,15 @@ from flaskext.bcrypt import Bcrypt
 #own modules
 from decorators import *
 
+dir = os.path.dirname(__file__)
+database_location = os.path.join(dir, '/db/production.db')
+
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config.update(
     DEBUG=False,
     SECRET_KEY='oIOXe0CQufWKBR1B',
-    DATABASE='db/production.db'
+    DATABASE=database_location
                 )
 #TODO SHOW COMPLETED %
 
