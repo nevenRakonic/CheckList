@@ -13,7 +13,7 @@ database_location = os.path.join(dir, 'db/production.db')
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config.update(
-    DEBUG=False,
+    DEBUG=True,
     SECRET_KEY='oIOXe0CQufWKBR1B',
     DATABASE=database_location
                 )
