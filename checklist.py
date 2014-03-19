@@ -1,25 +1,16 @@
-import os
 import sqlite3
 from datetime import datetime
 from flask import Flask, render_template, request, url_for
 from flask import g, redirect, jsonify, session, flash
 from flaskext.bcrypt import Bcrypt
 #own modules
-from decorators import *
+from decorators import login_required, permissions_required
 
-#dir = os.path.dirname(__file__)
-#database_location = os.path.join(dir, 'db/production.db')
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-#app.config.from_envvar('CHECKLIST_SETTING')
+app.config.from_envvar('CHECKLIST_SETTING')
 
-# app.config.update(
-#     DEBUG=True,
-#     SECRET_KEY='oIOXe0CQufWKBR1B',
-#     DATABASE=database_location
-#                 )
-#TODO SHOW COMPLETED %
 
 #DB FUNCTIONS
 def connect_db():
@@ -35,7 +26,7 @@ def get_db():
         db = g._database = connect_db()
     return db
 
-def query_db(query, args=(), one=False, script=False):
+def query_db(query, args=(), one=False):
     """Queries database, one is for one result only.
     """
     cur = get_db().execute(query, args)
@@ -226,31 +217,29 @@ def add_permission(list_id):
 
     return redirect('/' + str(list_id) + '/')
 
-@app.route('/<int:list_id>/add_post', methods=['GET', 'POST'])
+@app.route('/<int:list_id>/add_post', methods=['POST'])
 @login_required
 @permissions_required
 def add_post(list_id):
     """Add's a post to the list
     """
-    if request.method == 'POST':
+    body = request.form['body']
+    body = "<br>".join(body.split("\n"))
+    status = request.form['status']
 
-        body = request.form['body']
-        body = "<br>".join(body.split("\n"))
-        status = request.form['status']
+    author = session["username"]
+    post_time = get_current_time()
 
-        author = session["username"]
-        post_time = get_current_time()
+    modify_db(
+        'INSERT INTO posts (list_id, body, status, post_time, author) VALUES (?, ?, ?, ?, ?);',
+         [list_id, body, status, post_time, author]
+         )
+    #TODO lack of status
 
-        modify_db(
-            'INSERT INTO posts (list_id, body, status, post_time, author) VALUES (?, ?, ?, ?, ?);',
-             [list_id, body, status, post_time, author]
-             )
-        #TODO lack of status
+    flash("post added")
+    return redirect("/{0}/".format(list_id))
 
-        flash("post added")
-        return redirect("/{0}/".format(list_id))
 
-    return render_template('add_post.html', list_id=list_id)
 
 #jeditable uses this edit function
 @app.route('/<int:list_id>/edit', methods=['POST'])
@@ -278,7 +267,7 @@ def delete_list(list_id):
     places it appears in the db
     """
     #table names can't be parameterized, use until cascade gets set up properly in the database
-    modify_db('DELETE FROM lists WHERE id = ?;', [ list_id])
+    modify_db('DELETE FROM lists WHERE id = ?;', [list_id])
     modify_db('DELETE FROM posts WHERE list_id = ?;', [list_id])
     modify_db('DELETE FROM permissions WHERE list_id = ?;', [list_id])
 
@@ -290,24 +279,22 @@ def delete_list(list_id):
 @permissions_required
 def delete_post(list_id):
     """Deletes a post from the list via ajax"""
-    if list_id in session["permissions"]:
-        data = request.get_json()
-        data_id = data["id"]
-        modify_db('DELETE FROM posts WHERE ID=?', [data_id])
+    data = request.get_json()
+    data_id = data["id"]
+    modify_db('DELETE FROM posts WHERE ID=?', [data_id])
 
-        return jsonify(result=None) #needs to return something, so it only returns empty data
+    #needs to return something, so it only returns empty data
+    return jsonify(result=None)
 
 @app.route('/<int:list_id>/status', methods=['POST'])
 @login_required
 @permissions_required
 def change_status(list_id):
     """Changes post status via ajax"""
-    if list_id in session["permissions"]:
-        data = request.get_json()
-
-        data_id = data["id"]
-        status = data["status"]
-        modify_db('UPDATE posts SET status=? WHERE ID=?', [status, data_id])
+    data = request.get_json()
+    data_id = data["id"]
+    status = data["status"]
+    modify_db('UPDATE posts SET status=? WHERE ID=?', [status, data_id])
 
     return jsonify(result=None)
 

@@ -64,6 +64,7 @@ a {
 .editable {
     height: 100px;
     overflow: auto;
+    word-wrap: break-word;
 }
 #posts-header {
     padding-bottom: 10px;
@@ -97,10 +98,7 @@ a {
     padding: 0px 4px;
     border-radius: 0;
 }
-.editable {
-    word-wrap: break-word;
-    min-height: 85px;
-}
+
 /* Custom media queries */
 
 @media screen and (max-width: 768px) {
