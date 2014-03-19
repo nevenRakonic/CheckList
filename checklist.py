@@ -12,11 +12,13 @@ database_location = os.path.join(dir, 'db/production.db')
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-app.config.update(
-    DEBUG=True,
-    SECRET_KEY='oIOXe0CQufWKBR1B',
-    DATABASE=database_location
-                )
+app.config.from_envvar('CHECKLIST_SETTING')
+
+# app.config.update(
+#     DEBUG=True,
+#     SECRET_KEY='oIOXe0CQufWKBR1B',
+#     DATABASE=database_location
+#                 )
 #TODO SHOW COMPLETED %
 
 #DB FUNCTIONS
@@ -351,6 +353,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Logs in user, saves data to session"""
+    print app.config['DATABASE']
     if request.method == 'POST':
         logged_in = False
 
