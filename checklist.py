@@ -7,8 +7,8 @@ from flaskext.bcrypt import Bcrypt
 #own modules
 from decorators import *
 
-dir = os.path.dirname(__file__)
-database_location = os.path.join(dir, 'db/production.db')
+#dir = os.path.dirname(__file__)
+#database_location = os.path.join(dir, 'db/production.db')
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -353,7 +353,6 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Logs in user, saves data to session"""
-    print app.config['DATABASE']
     if request.method == 'POST':
         logged_in = False
 
