@@ -1,7 +1,7 @@
-import os
+#import os
 
-dir = os.path.dirname(__file__)
-database_location = os.path.join(dir, 'db/test_db.db')
+#dir = os.path.dirname(__file__)
+#database_location = os.path.join(dir, 'db/test_db.db')
 
 DEBUG=True
 SECRET_KEY='oIOXe0CQufWKBR1B'

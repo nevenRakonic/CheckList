@@ -12,7 +12,7 @@ database_location = os.path.join(dir, 'db/production.db')
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-app.config.from_envvar('CHECKLIST_SETTING')
+#app.config.from_envvar('CHECKLIST_SETTING')
 
 # app.config.update(
 #     DEBUG=True,
