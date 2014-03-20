@@ -309,8 +309,13 @@ def register():
         password = request.form['password']
         duplicate_pass = request.form['duplicate_pass']
 
-
         #TODO refactor this
+        if len(username) < 2:
+            flash("username must have at least two characters")
+            return render_template("register.html")
+        if len(username) > 30:
+            flash("username can't have more than 30 characters")
+            return render_template("register.html")
         if find_username(username):
             flash("username already exists!")
             return render_template("register.html")
@@ -320,9 +325,7 @@ def register():
         if not password == duplicate_pass:
             flash("passwords didn't match")
             return render_template("register.html")
-        if len(username) > 30:
-            flash("username can't have more than 30 characters")
-            return render_template("register.html")
+
 
         password = bcrypt.generate_password_hash(request.form['password'])
         join_date = get_current_time()
