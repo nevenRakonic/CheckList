@@ -9,7 +9,7 @@ from decorators import login_required, permissions_required
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-app.config.from_envvar('CHECKLIST_SETTING')
+#app.config.from_envvar('CHECKLIST_SETTING')
 
 
 #DB FUNCTIONS
